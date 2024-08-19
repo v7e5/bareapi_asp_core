@@ -1,0 +1,14 @@
+{
+  "port": 8000,
+  "dbconn": "Data Source=api.db",
+  "abc": {
+    "xxx": 370,
+    "def": {
+      "ghi": [
+        "xyz",
+        101,
+        "boo"
+      ]
+    }
+  }
+}
