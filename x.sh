@@ -8,6 +8,7 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    category/create
     'echo'
     env
     todo/list
@@ -19,7 +20,6 @@ ccc() {
     sess
     user/list
     todo/create
-    category/create
     user/create
   )
 
@@ -48,7 +48,7 @@ w() {
           echo
           case ${f} in
             x.sh) ./x.sh -c || :;;
-            x.sql) cat ${f} | sqlite3 h.db || :;;
+            x.sql) cat ${f} | sqlite3 api.db || :;;
           esac
         fi
       done

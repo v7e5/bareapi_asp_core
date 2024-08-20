@@ -2,6 +2,19 @@
 set -euo pipefail
 
 xxx() {
+  cat category.json
+}
+
+_xxx() {
+cat <<EOL
+{
+  "name": "bug",
+  "color": "d73a4a"
+}
+EOL
+}
+
+_xxx() {
 cat <<EOL
 {
   "boolt": true,
@@ -44,7 +57,7 @@ _xxx() {
 EOL
 }
 
-__xxx() {
+_xxx() {
   cat <<EOL
 {
   "username": "kjv",

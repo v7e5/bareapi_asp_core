@@ -75,6 +75,14 @@ static class Util {
     Console.WriteLine(t);
   }
 
+  public static string? get(this JsonElement j, string k) {
+    if(j.TryGetProperty(k, out var _k)) {
+      var s = _k.GetString()?.Trim();
+      return (s?.Length != 0) ? s : null;
+    }
+    return null;
+  }
+
   public static FrozenDictionary<string, JsonElement> fd(this JsonElement o) {
     return o.EnumerateObject()
       .ToFrozenDictionary(kv => kv.Name, kv => kv.Value);
