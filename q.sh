@@ -2,14 +2,31 @@
 set -euo pipefail
 
 xxx() {
+cat <<EOL
+{
+}
+EOL
+}
+
+kxxx() {
+cat <<EOL
+{
+  "username": "kjv",
+  "passwd": "fjfjfj"
+}
+EOL
+}
+
+_xxx() {
   cat category.json
 }
 
 _xxx() {
 cat <<EOL
 {
-  "name": "bug",
-  "color": "d73a4a"
+  "id": 2,
+  "name": "duplicate",
+  "color": "cfd3d7"
 }
 EOL
 }

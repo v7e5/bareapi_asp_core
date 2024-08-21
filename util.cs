@@ -1,71 +1,6 @@
 ﻿namespace util;
 
-//readonly record struct JSON(JsonElement Body) {
-//  public static async ValueTask<JSON> BindAsync(HttpContext ctx) {
-//    using(var o = await JsonDocument.ParseAsync(ctx.Request.Body)) {
-//      return new JSON(o.RootElement.Clone());
-//    }
-//  }
-//}
-
 static class Util {
-
-  public static string _sator =
-    """
-    sator
-    arepo
-    tenet
-    opera
-    rotas
-    """;
-
-  public static string _json =
-    """
-    {
-      "str": "abc",
-      "int": 370,
-      "double": 370.9999,
-      "bool": true,
-      "null": null,
-      "arr_str": [
-        "abc",
-        "def",
-        "ghi"
-      ],
-      "arr_mix": [
-        1,
-        "one",
-        1
-      ],
-      "arr_num": [
-        1,
-        2,
-        3
-      ],
-      "composite": {
-        "str": "abc",
-        "int": 370,
-        "double": 370.9999,
-        "bool": true,
-        "null": null,
-        "arr_str": [
-          "abc",
-          "def",
-          "ghi"
-        ],
-        "arr_mix": [
-          1,
-          "one",
-          1
-        ],
-        "arr_num": [
-          1,
-          2,
-          3
-        ]
-      }
-    }
-    """;
 
   public static void cl<T>(T x) {
     Console.WriteLine(x);
@@ -75,12 +10,27 @@ static class Util {
     Console.WriteLine(t);
   }
 
-  public static string? get(this JsonElement j, string k) {
-    if(j.TryGetProperty(k, out var _k)) {
-      var s = _k.GetString()?.Trim();
+  public static string? _str(this JsonElement j, string k) {
+    if(j.TryGetProperty(k, out var _v)) {
+      var s = _v.GetString()?.Trim();
       return (s?.Length != 0) ? s : null;
     }
     return null;
+  }
+
+  public static long? _long(this JsonElement j, string k) {
+    if(j.TryGetProperty(k, out var _v) && _v.TryGetInt64(out var _i)) {
+      return _i;
+    }
+    return null;
+  }
+
+  public static IEnumerable<IDictionary<string, object>> ToDictArray(
+    this SqliteDataReader reader) {
+    return reader.Cast<IDataRecord>()
+      .Select(e => Enumerable
+        .Range(0, e.FieldCount).ToDictionary(e.GetName, e.GetValue))
+      .ToArray();
   }
 
   public static FrozenDictionary<string, JsonElement> fd(this JsonElement o) {
@@ -130,13 +80,6 @@ static class Util {
       ..a,
       (((i % 2) == 0) ? (i / 2) : ((3 * i) + 1))
     ]);
-  }
-
-  public static IEnumerable<IDictionary<string, object>> dict(
-    SqliteDataReader reader) {
-    return reader.Cast<IDataRecord>()
-      .Select(e => Enumerable.Range(0, e.FieldCount)
-        .ToFrozenDictionary(e.GetName, e.GetValue));
   }
 
 }

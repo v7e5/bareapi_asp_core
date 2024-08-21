@@ -17,6 +17,24 @@ quote table tabs tcl
 .tables
 
 delete from category
+
+update or ignore category
+  set name = 'duplicate', color = 'cfd3d7'
+where id = 2
+update or ignore category set name = 'duplicatez' where id = 2
+delete from category where id = 77
 */
 
-select * from category
+select * from category where id = 75
+
+
+/*
+
+┌────┬─────────────┬────────┐
+│ id │    name     │ color  │
+├────┼─────────────┼────────┤
+│ 1  │ bug         │ d73a4a │
+│ 2  │ duplicate   │ cfd3d7 │
+│ 3  │ enhancement │ a2eeef │
+└────┴─────────────┴────────┘
+*/

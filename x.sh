@@ -8,7 +8,13 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    category/list
+    user/list
+    user/create
+    user/delete
+    category/delete
     category/create
+    category/update
     'echo'
     env
     todo/list
@@ -25,6 +31,7 @@ ccc() {
 
   #-o /dev/null \
   #--write-out "@./write_out_fmt.yml" \
+    #--data-binary "$(./q.sh -x)" \
   curl -vs -X POST \
     --cookie ${cke} \
     --cookie-jar ${cke} \
