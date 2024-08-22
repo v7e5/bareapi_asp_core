@@ -1,32 +1,24 @@
 #!/usr/bin/zsh
 set -euo pipefail
 
-cke='./cookie'
+cke='./misc/cookie'
 
 ccc() {
   local _i=0
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
-    category/list
     user/list
-    user/create
-    user/delete
-    category/delete
-    category/create
-    category/update
-    'echo'
-    env
-    todo/list
-    dummy
-    category/list
-    login
     'logout'
-    dash
-    sess
-    user/list
-    todo/create
+    user/delete
     user/create
+    category/list
+    category/delete
+    category/update
+    category/create
+    'echo'
+    login
+    env
   )
 
   #-o /dev/null \
@@ -37,7 +29,7 @@ ccc() {
     --cookie-jar ${cke} \
     -H 'content-type: application/json' \
     -H 'accept: application/json' \
-    --data-binary "$(./q.sh -x)" \
+    --data-binary "$(./misc/q.sh -x)" \
     'http://0.0.0.0:8000/'${a[1]} | jq
 }
 
@@ -54,8 +46,8 @@ w() {
           cl -b 27  -f 51 -o '------------------------------------------------'
           echo
           case ${f} in
-            x.sh) ./x.sh -c || :;;
-            x.sql) cat ${f} | sqlite3 api.db || :;;
+            x.sh) ./misc/x.sh -c || :;;
+            x.sql) cat ./misc/${f} | sqlite3 api.db || :;;
           esac
         fi
       done

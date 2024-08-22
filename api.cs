@@ -1,4 +1,34 @@
-﻿class XXX {
+﻿class Auth: IMiddleware {
+  private readonly SqliteConnection conn;
+
+  public Auth(SqliteConnection _conn) => conn = _conn;
+
+  public long? GetCurrentUser(HttpContext ctx) {
+    if(ctx.Request.Cookies.TryGetValue("_id", out var k)) {
+      using var cmd = conn.CreateCommand();
+      cmd.CommandText = "select userid from session where id=:id";
+      cmd.Parameters.AddWithValue("id", k);
+      return (long?) cmd.ExecuteScalar();
+    }
+    return null;
+  }
+
+  public async Task InvokeAsync(HttpContext ctx, RequestDelegate nxt) {
+    cl($"[;38;5;27;1m[{ctx.Request.Path}][0m");
+
+    if((this.GetCurrentUser(ctx) is not null)
+      || (ctx.Request.Path.ToString() == "/login")) {
+      await nxt(ctx);
+    } else {
+      ctx.Response.StatusCode = 403;
+      ctx.Response.ContentType = "application/json";
+      await ctx.Response.WriteAsync("""{"error": "verboten"}""");
+      await ctx.Response.CompleteAsync();
+    }
+  }
+}
+
+class XXX {
   static async Task Main() {
     cl(
       String.Join("", collatz([Random.Shared.Next(1, 79)])
@@ -29,7 +59,8 @@
           builder.Configuration.GetValue<string>("dbconn"));
         conn.Open();
         return conn;
-      });
+      })
+      .AddScoped<Auth>();
 
     var app = builder.Build();
 
@@ -39,318 +70,106 @@
         .AllowAnyMethod()
         .AllowAnyHeader();
     });
+    app.UseMiddleware<Auth>();
     app.UseStaticFiles();
     app.UseRouting();
     app.MapShortCircuit(404, "robots.txt", "favicon.ico", ".well-known");
     app.UseExceptionHandler();
     app.UseDeveloperExceptionPage();
 
-    app.MapPost("/env", () => {
-      return env();
-    });
+    app.MapPost("/env", () => env());
 
-    app.MapPost("/echo", (JsonElement o) => {
-      return o;
-    });
+    app.MapPost("/echo", (JsonElement o) => o);
 
-    var _category = app.MapGroup("/category");
+    app.MapPost("/login", (
+      HttpContext ctx, SqliteConnection conn, Auth auth, JsonElement o) => {
 
-    _category.MapPost("/create",
-      (HttpContext ctx, SqliteConnection conn, JsonElement o) => {
-
-      if(o.ValueKind is not JsonValueKind.Array) {
-        return Results.BadRequest(new {error = "not an array"});
-      }
-
-      var arr = o.EnumerateArray();
-      var count = arr.Count();
-
-      if(count == 0) {
-        return Results.BadRequest(new {error = "array is empty"});
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "insert or ignore into category(name, color) values ";
-
-      for(int i = 0; i < count; i++) {
-        var ob = arr.ElementAt(i);
-
-        if(ob.ValueKind is not JsonValueKind.Object) {
-          continue;
-        }
-
-        string? name = ob._str("name");
-        string? color = ob._str("color");
-
-        if((name, color) is (null, null)) {
-          continue;
-        }
-
-        cmd.CommandText += $"(:name_{i}, :color_{i}),";
-
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "name_" + i,
-            SqliteType = SqliteType.Text,
-            Value = name
-          });
-
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "color_" + i,
-            SqliteType = SqliteType.Text,
-            Value = color
-          });
-      }
-      cmd.CommandText = cmd.CommandText.TrimEnd(',');
-      cmd.ExecuteNonQuery();
-
-      return Results.Ok();
-    });
-
-    _category.MapPost("/list",
-      (HttpContext ctx, SqliteConnection conn, JsonElement? o) => {
-
-      long? id = null;
-      string? name = null;
-      string? color = null;
-
-      if(o?.ValueKind is JsonValueKind.Object) {
-         id = o?._long("id");
-         name = o?._str("name");
-         color = o?._str("color");
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "select id, name, color from category where 1 ";
-
-      if(id is not null) {
-        cmd.CommandText += " and id=:id ";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "id",
-            SqliteType = SqliteType.Integer,
-            Value = id
-          });
-      }
-
-      if(name is not null) {
-        cmd.CommandText += " and name like :name ";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "name",
-            SqliteType = SqliteType.Text,
-            Value = $"%{name}%"
-          });
-      }
-
-      if(color is not null) {
-        cmd.CommandText += " and color = :color ";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "color",
-            SqliteType = SqliteType.Text,
-            Value = color
-          });
-      }
-
-      return cmd.ExecuteReader().ToDictArray();
-    });
-
-    _category.MapPost("/update",
-      (HttpContext ctx, SqliteConnection conn, JsonElement o) => {
-
-      if(o.ValueKind is not JsonValueKind.Object) {
-        return Results.BadRequest(new {error = "not an object"});
-      }
-
-      long? id = o._long("id");
-      if(id is null) {
-        return Results.BadRequest(new {error = "need an id"});
-      }
-
-      string? name = o._str("name");
-      string? color = o._str("color");
-
-      if((name, color) is (null, null)) {
-        return Results.BadRequest(new {error = "no field to update"});
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "update or ignore category set ";
-
-      if(name is not null) {
-        cmd.CommandText += " name = :name ,";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "name",
-            SqliteType = SqliteType.Text,
-            Value = name
-          });
-      }
-
-      if(color is not null) {
-        cmd.CommandText += " color = :color ,";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "color",
-            SqliteType = SqliteType.Text,
-            Value = color
-          });
-      }
-
-      cmd.CommandText = cmd.CommandText.TrimEnd(',');
-
-      cmd.CommandText += " where id = :id";
-      cmd.Parameters.Add(
-        new SqliteParameter {
-          ParameterName = "id",
-          SqliteType = SqliteType.Integer,
-          Value = id
-        });
-
-      cmd.ExecuteNonQuery();
-
-      return Results.Ok();
-    });
-
-    _category.MapPost("/delete",
-      (HttpContext ctx, SqliteConnection conn, JsonElement o) => {
-
-      if(o.ValueKind is not JsonValueKind.Object) {
-        return Results.BadRequest(new {error = "not an object"});
-      }
-
-      long? id = o._long("id");
-      if(id is null) {
-        return Results.BadRequest(new {error = "need an id"});
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "delete from category where id = :id";
-
-      cmd.Parameters.Add(
-        new SqliteParameter {
-          ParameterName = "id",
-          SqliteType = SqliteType.Integer,
-          Value = id
-        });
-
-      cmd.ExecuteNonQuery();
-
-      return Results.Ok();
-    });
-
-    var _user = app.MapGroup("/user");
-
-    _user.MapPost("/create",
-      (HttpContext ctx, SqliteConnection conn, JsonElement o) => {
-
-      if(o.ValueKind is not JsonValueKind.Object) {
-        return Results.BadRequest(new {error = "not an object"});
+      if (auth.GetCurrentUser(ctx) is not null) {
+        cl("logged in - skip");
+        return Results.Ok();
       }
 
       string? username = o._str("username");
       //plain-text here for testing purposes, do not use in production
-      string? passwd = o._str("passwd"); 
+      string? passwd = o._str("passwd");
 
       if((username, passwd) is (null, null)) {
         return Results.BadRequest(new {error = "need a name and password"});
       }
 
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText
-        = "insert into user(username, passwd) values (:username, :passwd)";
+      using var user_cmd = conn.CreateCommand();
+      user_cmd.CommandText
+        = "select id from user where username=:u and passwd=:p";
+      user_cmd.Parameters.AddWithValue("u", username);
+      user_cmd.Parameters.AddWithValue("p", passwd);
 
-      cmd.Parameters.Add(
-        new SqliteParameter {
-          ParameterName = "username",
-          SqliteType = SqliteType.Text,
-          Value = username
-        });
+      var userid = user_cmd.ExecuteScalar();
 
-      cmd.Parameters.Add(
-        new SqliteParameter {
-          ParameterName = "passwd",
-          SqliteType = SqliteType.Text,
-          Value = passwd
-        });
-
-      try {
-        cmd.ExecuteNonQuery();
-      } catch (SqliteException ex) {
-        return Results.BadRequest(new {
-          error = (ex.SqliteErrorCode == 19)
-            ? "username already exists" : ex.Message
-        });
+      if(userid is null) {
+        return Results.BadRequest(new {error = "incorrect user/pass"});
       }
+
+      using var sess_del = conn.CreateCommand();
+      sess_del.CommandText = "delete from session where userid=:u";
+      sess_del.Parameters.AddWithValue("u", userid);
+      sess_del.ExecuteNonQuery();
+
+      static IEnumerable<string> _guid() {
+        while(true) {
+          yield return Guid.NewGuid().ToString();
+        }
+      }
+
+      foreach(var g in _guid()) {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "select id from session where id=:id";
+        cmd.Parameters.AddWithValue("id", g);
+
+        if(cmd.ExecuteScalar() is null) {
+          using var sess_add = conn.CreateCommand();
+          sess_add.CommandText
+            = "insert into session(id, userid) values (:g, :u)";
+          sess_add.Parameters.AddWithValue("g", g);
+          sess_add.Parameters.AddWithValue("u", userid);
+          sess_add.ExecuteNonQuery();
+
+          ctx.Response.Headers.Append(
+            "set-cookie", "_id=" + g
+            + ";domain=0.0.0.0;path=/;httponly;samesite=lax;max-age=604800"
+          );
+          break;
+        }
+      };
 
       return Results.Ok();
     });
 
-    _user.MapPost("/list",
-      (HttpContext ctx, SqliteConnection conn, JsonElement? o) => {
+    app.MapPost("/logout", (
+      HttpContext ctx, SqliteConnection conn, Auth auth) => {
 
-      long? id = null;
-      string? name = null;
+      using var sess_del = conn.CreateCommand();
+      sess_del.CommandText = "delete from session where userid=:u";
+      sess_del.Parameters.AddWithValue("u", auth.GetCurrentUser(ctx));
+      sess_del.ExecuteNonQuery();
 
-      if(o?.ValueKind is JsonValueKind.Object) {
-         id = o?._long("id");
-         name = o?._str("name");
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "select id, username from user where 1 ";
-
-      if(id is not null) {
-        cmd.CommandText += " and id=:id ";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "id",
-            SqliteType = SqliteType.Integer,
-            Value = id
-          });
-      }
-
-      if(name is not null) {
-        cmd.CommandText += " and name = :name ";
-        cmd.Parameters.Add(
-          new SqliteParameter {
-            ParameterName = "name",
-            SqliteType = SqliteType.Text,
-            Value = name
-          });
-      }
-
-      return cmd.ExecuteReader().ToDictArray();
-    });
-
-    _user.MapPost("/delete",
-      (HttpContext ctx, SqliteConnection conn, JsonElement o) => {
-
-      if(o.ValueKind is not JsonValueKind.Object) {
-        return Results.BadRequest(new {error = "not an object"});
-      }
-
-      long? id = o._long("id");
-      if(id is null) {
-        return Results.BadRequest(new {error = "need an id"});
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "delete from user where id = :id";
-
-      cmd.Parameters.Add(
-        new SqliteParameter {
-          ParameterName = "id",
-          SqliteType = SqliteType.Integer,
-          Value = id
-        });
-
-      cmd.ExecuteNonQuery();
+      ctx.Response.Headers.Append(
+        "set-cookie", "_id="
+        + ";domain=0.0.0.0;path=/;httponly;samesite=lax;max-age=0"
+      );
 
       return Results.Ok();
     });
+
+    var _category = app.MapGroup("/category");
+    _category.MapPost("/list",   Category.List);
+    _category.MapPost("/create", Category.Create);
+    _category.MapPost("/update", Category.Update);
+    _category.MapPost("/delete", Category.Delete);
+
+    var _user = app.MapGroup("/user");
+    _user.MapPost("/list",   User.List);
+    _user.MapPost("/create", User.Create);
+    _user.MapPost("/delete", User.Delete);
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

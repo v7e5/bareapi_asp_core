@@ -1,37 +1,43 @@
 #!/usr/bin/zsh
 set -euo pipefail
 
-xxx() {
+kx() {
 cat <<EOL
 {
 }
 EOL
 }
 
-kxxx() {
+kx() {
 cat <<EOL
 {
-  "username": "kjv",
-  "passwd": "fjfjfj"
+  "id": 4
 }
 EOL
 }
 
-_xxx() {
-  cat category.json
-}
-
-_xxx() {
+kx() {
 cat <<EOL
 {
-  "id": 2,
-  "name": "duplicate",
-  "color": "cfd3d7"
+  "username": "kkk",
+  "passwd": "kkkkk"
 }
 EOL
 }
 
-_xxx() {
+kx() {
+  cat ./misc/category.json
+}
+
+kx() {
+cat <<EOL
+{
+  "id": 75
+}
+EOL
+}
+
+kx() {
 cat <<EOL
 {
   "boolt": true,
@@ -64,7 +70,7 @@ cat <<EOL
 EOL
 }
 
-_xxx() {
+kx() {
   cat <<EOL
 {
   "xcursor_next": 43,
@@ -74,7 +80,7 @@ _xxx() {
 EOL
 }
 
-_xxx() {
+kx() {
   cat <<EOL
 {
   "username": "kjv",
