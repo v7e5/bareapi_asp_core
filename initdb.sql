@@ -18,9 +18,9 @@ create table category (
 );
 create table todo (
   id integer primary key,
-  task text null,
-  status integer default 0,
-  due text default current_timestamp,
+  task text not null,
+  done integer default 0,
+  due_unix_timestamp integer not null,
   userid integer not null,
   constraint fk_todo_user
     foreign key (userid) references user(id) on delete cascade
@@ -28,9 +28,16 @@ create table todo (
 create table category_todo (
   categoryid integer not null,
   todoid integer not null,
+  constraint pk_category_todo
+    primary key (categoryid, todoid),
   constraint fk_category_todo_category
     foreign key (categoryid) references category(id) on delete cascade,
   constraint fk_category_todo_todo
     foreign key (todoid) references todo(id) on delete cascade
+);
+create table az (
+  id integer primary key,
+  letter text not null,
+  due integer not null
 );
 commit;

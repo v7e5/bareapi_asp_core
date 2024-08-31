@@ -1,87 +1,60 @@
 static class Category {
 
-  public static IResult Create(
-    HttpContext ctx, SqliteConnection conn, JsonElement o) {
-
+  public static IResult Create(SqliteConnection conn, JsonElement o) {
     if(o.ValueKind is not JsonValueKind.Array) {
       return Results.BadRequest(new {error = "not an array"});
-    }
-
-    var arr = o.EnumerateArray();
-    var count = arr.Count();
-
-    if(count == 0) {
-      return Results.BadRequest(new {error = "array is empty"});
     }
 
     using var cmd = conn.CreateCommand();
     cmd.CommandText = "insert or ignore into category(name, color) values ";
 
-    for(int i = 0; i < count; i++) {
-      var ob = arr.ElementAt(i);
-
-      if(ob.ValueKind is not JsonValueKind.Object) {
-        continue;
-      }
-
+    int _i = 0;
+    foreach(var ob in o.EnumerateArray()) {
       string? name = ob._str("name");
       string? color = ob._str("color");
-
       if((name, color) is (null, null)) {
         continue;
       }
 
+      int i = _i++;
       cmd.CommandText += $"(:name_{i}, :color_{i}),";
       cmd.Parameters.AddWithValue($"name_{i}", name);
       cmd.Parameters.AddWithValue($"color_{i}", color);
     }
+
+    if(_i == 0) {
+      return Results.BadRequest(new {error = "array is empty"});
+    }
+
     cmd.CommandText = cmd.CommandText.TrimEnd(',');
     cmd.ExecuteNonQuery();
 
     return Results.Ok();
   }
 
-  public static IEnumerable<IDictionary<string, object>> List(
-    HttpContext ctx, SqliteConnection conn, JsonElement? o) {
-
-    long? id = null;
-    string? name = null;
-    string? color = null;
-
-    if(o?.ValueKind is JsonValueKind.Object) {
-      id = o?._long("id");
-      name = o?._str("name");
-      color = o?._str("color");
-    }
-
+  public static IResult List(SqliteConnection conn, JsonElement? o) {
     using var cmd = conn.CreateCommand();
     cmd.CommandText = "select id, name, color from category where 1 ";
 
-    if(id is not null) {
+    if(o?._long("id") is long id) {
       cmd.CommandText += " and id=:id ";
       cmd.Parameters.AddWithValue("id", id);
     }
 
-    if(name is not null) {
+    if(o?._str("name") is string name) {
       cmd.CommandText += " and name like :name ";
       cmd.Parameters.AddWithValue("name", $"%{name}%");
     }
 
-    if(color is not null) {
+    if(o?._str("color") is string color) {
       cmd.CommandText += " and color = :color ";
       cmd.Parameters.AddWithValue("color", color);
     }
 
-    return cmd.ExecuteReader().ToDictArray();
+    return Results.Ok(cmd.ExecuteReader().ToDictArray());
   }
 
-  public static IResult Update(
-    HttpContext ctx, SqliteConnection conn, JsonElement o) {
-
-    if(o.ValueKind is not JsonValueKind.Object) {
-      return Results.BadRequest(new {error = "not an object"});
-    }
-
+  public static IResult Update(SqliteConnection conn, JsonElement o) {
     long? id = o._long("id");
     if(id is null) {
       return Results.BadRequest(new {error = "need an id"});
@@ -117,13 +90,7 @@ static class Category {
     return Results.Ok();
   }
 
-  public static IResult Delete(
-    HttpContext ctx, SqliteConnection conn, JsonElement o) {
-
-    if(o.ValueKind is not JsonValueKind.Object) {
-      return Results.BadRequest(new {error = "not an object"});
-    }
-
+  public static IResult Delete(SqliteConnection conn, JsonElement o) {
     long? id = o._long("id");
     if(id is null) {
       return Results.BadRequest(new {error = "need an id"});

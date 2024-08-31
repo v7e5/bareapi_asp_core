@@ -13,6 +13,8 @@
     return null;
   }
 
+  public bool IsAdmin(HttpContext ctx) => this.GetCurrentUser(ctx) == 1;
+
   public async Task InvokeAsync(HttpContext ctx, RequestDelegate nxt) {
     cl($"[;38;5;27;1m[{ctx.Request.Path}][0m");
 
@@ -77,13 +79,29 @@ class XXX {
     app.UseExceptionHandler();
     app.UseDeveloperExceptionPage();
 
-    app.MapPost("/env", () => env());
-
     app.MapPost("/echo", (JsonElement o) => o);
 
-    app.MapPost("/login", (
-      HttpContext ctx, SqliteConnection conn, Auth auth, JsonElement o) => {
+    app.MapPost("/env", () => env());
 
+    app.MapPost("/now", (
+      Auth auth, HttpContext ctx, SqliteConnection conn
+    ) => {
+      using var cmd = conn.CreateCommand();
+      cmd.CommandText = "select unixepoch()";
+
+      var db = (long?) cmd.ExecuteScalar();
+      var cs = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+      var ts = DateTimeOffset.FromUnixTimeSeconds(cs).ToString();
+
+      return new {
+        db, cs, ts,
+        user = auth.GetCurrentUser(ctx)
+      };
+    });
+
+    app.MapPost("/login", (
+      HttpContext ctx, SqliteConnection conn, Auth auth, JsonElement o
+    ) => {
       if (auth.GetCurrentUser(ctx) is not null) {
         cl("logged in - skip");
         return Results.Ok();
@@ -145,8 +163,8 @@ class XXX {
     });
 
     app.MapPost("/logout", (
-      HttpContext ctx, SqliteConnection conn, Auth auth) => {
-
+      HttpContext ctx, SqliteConnection conn, Auth auth
+    ) => {
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from session where userid=:u";
       sess_del.Parameters.AddWithValue("u", auth.GetCurrentUser(ctx));
@@ -160,6 +178,8 @@ class XXX {
       return Results.Ok();
     });
 
+    app.MapPost("/az", AZ.List);
+
     var _category = app.MapGroup("/category");
     _category.MapPost("/list",   Category.List);
     _category.MapPost("/create", Category.Create);
@@ -170,6 +190,12 @@ class XXX {
     _user.MapPost("/list",   User.List);
     _user.MapPost("/create", User.Create);
     _user.MapPost("/delete", User.Delete);
+
+    var _todo = app.MapGroup("/todo");
+    _todo.MapPost("/list",   Todo.List);
+    _todo.MapPost("/create", Todo.Create);
+    _todo.MapPost("/update", Todo.Update);
+    _todo.MapPost("/delete", Todo.Delete);
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

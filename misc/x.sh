@@ -3,27 +3,45 @@ set -euo pipefail
 
 cke='./misc/cookie'
 
+bulk() {
+  while IFS= read -r l; do
+    curl -vs -X POST \
+      --cookie ${cke} \
+      --cookie-jar ${cke} \
+      -H 'content-type: application/json' \
+      -H 'accept: application/json' \
+      --data-binary "${l}" \
+      'http://0.0.0.0:8000/todo/create' || :
+  done <./misc/todo_2.txt
+}
+
 ccc() {
   local _i=0
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
-    user/list
-    'logout'
-    user/delete
+    todo/list
+    todo/delete
     user/create
+    user/delete
+    user/list
+    login
+    'logout'
+    todo/create
+    az
+    now
+    todo/update
     category/list
+    category/create
     category/delete
     category/update
-    category/create
     'echo'
-    login
     env
   )
 
   #-o /dev/null \
   #--write-out "@./write_out_fmt.yml" \
-    #--data-binary "$(./q.sh -x)" \
+  #--data-binary "$(./misc/q.sh -x)" \
   curl -vs -X POST \
     --cookie ${cke} \
     --cookie-jar ${cke} \
@@ -36,6 +54,7 @@ ccc() {
 w() {
   local a=(
     x.sh
+    q.sh
     x.sql
   )
 
@@ -47,6 +66,7 @@ w() {
           echo
           case ${f} in
             x.sh) ./misc/x.sh -c || :;;
+            q.sh) ./misc/x.sh -c || :;;
             x.sql) cat ./misc/${f} | sqlite3 api.db || :;;
           esac
         fi

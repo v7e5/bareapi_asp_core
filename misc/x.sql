@@ -3,38 +3,100 @@ pragma foreign_keys=on;
 /*
   scratch file i use to quickly test sql queries, 
   run ./x.sh -w (runs watch), check ./x.sh to see how this works.
-*/
 
-
-/*
 .mode
 ascii box column csv html insert json line list markdown qbox
 quote table tabs tcl
 
-.mode json
-
-
 .tables
 
+select
+  t.id, t.task, t.done, t.due_unix_timestamp,
+  json_group_array(
+    json_object('id', c.id, 'name', c.name, 'color', c.color))
+    as categories
+from todo t
+  left join category_todo ct on t.id = ct.todoid
+  left join category c on c.id = ct.categoryid
+where t.userid = 3
+group by t.id order by t.due_unix_timestamp desc limit 10
+.mode json
 
-update or ignore category
-  set name = 'duplicate', color = 'cfd3d7'
-where id = 2
-update or ignore category set name = 'duplicatez' where id = 2
-delete from category where id = 77
-delete from category
+select id, task, done, datetime(due_unix_timestamp, 'unixepoch')
+  from todo where userid = 3 and id=100;
+
+
+update todo set task = 'centum' where id = 100;
 */
 
-select * from category 
+select * from category_todo where categoryid=8;
+select
+  t.id,
+  t.task,
+  t.done,
+  t.due_unix_timestamp,
+  json_group_array(
+    json_object('id', c.id, 'name', c.name, 'color', c.color)
+  ) as categories
+from todo t
+  left join category_todo ct on t.id = ct.todoid
+  left join category c on c.id = ct.categoryid
+where 1 
+  and t.task like '%hour%'
+  and ct.categoryid in (3)
+  and t.userid = 3
+group by t.id order by t.id asc 
 
 
 /*
 
-┌────┬─────────────┬────────┐
-│ id │    name     │ color  │
-├────┼─────────────┼────────┤
-│ 1  │ bug         │ d73a4a │
-│ 2  │ duplicate   │ cfd3d7 │
-│ 3  │ enhancement │ a2eeef │
-└────┴─────────────┴────────┘
+select * from category_todo where todoid = 100;
+
+update or ignore todo set 
+  task = '[Feature request] better playlist RSS feeds',
+  done = 0
+  where id = 100 and userid = 3
+
+[{"id":100,"task":"[Feature request] better playlist RSS feeds",
+"done":0,"datetime(due_unix_timestamp, 'unixepoch')":"2026-10-20 20:28:52"}]
+
+
+insert into az(letter, due) values
+('a', 111),
+('b', 112),
+('c', 113),
+('d', 114),
+('e', 115),
+('f', 116),
+('g', 117),
+('h', 118),
+('i', 119),
+('j', 120),
+('k', 121),
+('l', 122),
+('m', 123),
+('n', 124),
+('o', 125),
+('p', 126),
+('q', 127),
+('r', 128),
+('s', 129),
+('t', 130),
+('u', 130),
+('v', 132),
+('w', 133),
+('x', 134),
+('y', 135),
+('z', 136)
+create table az (
+  id integer primary key,
+  letter text not null,
+  due integer not null
+);
+
+insert into user(username, passwd) values
+('admin', 'forget'),
+('kjv', 'forget'),
+('xxx', 'forget')
+
 */

@@ -1,0 +1,38 @@
+{"task":"[Enhancement] audio codec representation","due":1830015059,"categories":[3]}
+{"task":"[Bug] Playback success statistics aren't being returned correctly on instances without proxy and/or DASH","due":1761520795,"categories":[1]}
+{"task":"Bug in Import/Export data","due":1774473463,"categories":[1,52]}
+{"task":"[Feature request] infocards","due":1735935331,"categories":[28]}
+{"task":"[Bug] Thumbnail goes out of the player and out of the HTML - horizontall scroll","due":1778849921,"categories":[1]}
+{"task":"[Feature request] videos don't appear white when watched, under the video recommendations","due":1816074208,"categories":[1,58]}
+{"task":"[Bug] Unhandled exception in spawn: Nil assertion failed on POST /feed/webhook","due":1807583318,"categories":[1]}
+{"task":"[Bug] DASH on Safari macOS is broken - Playback cannot continue. No available working or supported playlists.","due":1738975207,"categories":[1,33]}
+{"task":"[Enhancement] Ability to remove the timestamp from external link(s)","due":1721175493,"categories":[3]}
+{"task":"regular 403 in logs when loading the feed/popular page of a user","due":1798688174,"categories":[1]}
+{"task":"HTTP 414 error code by NGINX","due":1811543013,"categories":[7]}
+{"task":"[Feature request] Automatic migration system","due":1808014614,"categories":[28]}
+{"task":"[Bug] Changing video quality sometimes resets speed","due":1818358178,"categories":[]}
+{"task":"[Enhancement] Opus by default or selectable with DASH","due":1741473763,"categories":[3]}
+{"task":"[Enhancement] Fallback to \"medium\" when \"hd720\" is not available","due":1827537918,"categories":[3,73]}
+{"task":"[Bug] RefreshFeedJobs: REFRESH xxx : relation \"subscriptions_xxx\" already exists","due":1813808645,"categories":[1]}
+{"task":"[Bug] Misleading UX: Please do not ask users to bug-report slow databases (DB::PoolTimeout)","due":1764006966,"categories":[1]}
+{"task":"[Feature request] Add support for skip/previous buttons ","due":1754067553,"categories":[28]}
+{"task":"Translation for comments","due":1810168767,"categories":[28]}
+{"task":"[Bug]  Invidious doesn't log when IP database is on is unreachable","due":1809272862,"categories":[1,42,45]}
+{"task":"[Bug] cannot execute UPDATE in a read-only transaction (PQ::PQError)","due":1765871732,"categories":[1,42,66]}
+{"task":"[Bug] formatStreams.size parameter wrong in API response, always returns 16:9","due":1792407467,"categories":[1]}
+{"task":"[Bug] Nil assertion failed (NilAssertionError)","due":1760784757,"categories":[1]}
+{"task":"[Enhancement] Switching instances with \"local=true\" shouldn't suggest/redirect to instances where proxying is disabled","due":1791154363,"categories":[3]}
+{"task":"[Bug] \"Exception: Deleted or invalid channel\" until restart of invidious","due":1765400351,"categories":[1]}
+{"task":"[Bug] Clicking on the timecode redirects to the youtube page","due":1771477584,"categories":[1]}
+{"task":"[Feature request] New Design Language","due":1826211338,"categories":[28]}
+{"task":"[Feature request] Add config option like \"Don't autoload video data\"","due":1829054595,"categories":[28]}
+{"task":"[Enhancement] Comma separate hours unit on video duration over 1000 hours","due":1813464193,"categories":[3]}
+{"task":"[Enhancement] Allow video duration units to go up to days","due":1733704939,"categories":[3,33]}
+{"task":"[Bug] Shortcut to play the next video goes outside of a playlist.","due":1728828302,"categories":[1,11,33]}
+{"task":"[Bug] PG connections staying open","due":1786028352,"categories":[1]}
+{"task":"Videos in playlist getting duplicate","due":1773775842,"categories":[28,57]}
+{"task":"[Bug] Unavailable videos break playlists","due":1757727398,"categories":[1,57]}
+{"task":"[Bug] Index out of bounds (IndexError) when importing playlist","due":1722325875,"categories":[1,52]}
+{"task":"Add \"Buffering Goal (in seconds)\" settings","due":1731381778,"categories":[28,33]}
+{"task":"[Feature request] Add a 'jump to content' link","due":1818165514,"categories":[28,35,58]}
+{"task":"[Feature request] better playlist RSS feeds","due":1792528132,"categories":[28,48]}

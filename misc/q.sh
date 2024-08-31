@@ -3,7 +3,31 @@ set -euo pipefail
 
 kx() {
 cat <<EOL
+{}
+EOL
+}
+
+kx() {
+cat <<EOL
+[
+  {"name": "abc", "color": "ff0000"},
+  null,
+  {"name": "def", "color": "00ff00"},
+  {"name": "ghi", "color": "0000ff"},
+  111,
+  {"name": "jkl", "color": "000000"}
+]
+EOL
+}
+
+kx() {
+cat <<EOL
 {
+  "id": 3,
+  "ktask": "dummy",
+  "kdue":  $(date --date=" 2024-8-31 6:30AM" +%s 2> /dev/null || echo -n null),
+  "kdone": false,
+  "kcategories":[71, 31]
 }
 EOL
 }
@@ -11,16 +35,23 @@ EOL
 kx() {
 cat <<EOL
 {
-  "id": 4
+  "kid": 1,
+  "cursor_init": 63,
+  "cursor_next": 102,
+  "kcursor_prev": 11,
+  "kcategories":[33 ],
+  "kdue_to":  $(date --date=" 2023-10-7 6:30AM" +%s 2> /dev/null || echo -n null),
+  "kdone": true
 }
 EOL
 }
 
-kx() {
+x() {
 cat <<EOL
 {
-  "username": "kkk",
-  "passwd": "kkkkk"
+  "username": "kjv",
+  "passwd": "forget"
+
 }
 EOL
 }
@@ -29,13 +60,7 @@ kx() {
   cat ./misc/category.json
 }
 
-kx() {
-cat <<EOL
-{
-  "id": 75
-}
-EOL
-}
+
 
 kx() {
 cat <<EOL
@@ -66,25 +91,6 @@ cat <<EOL
     2,
     3
   ]
-}
-EOL
-}
-
-kx() {
-  cat <<EOL
-{
-  "xcursor_next": 43,
-  "cursor_prev": 52,
-  "cursor_first": 62
-}
-EOL
-}
-
-kx() {
-  cat <<EOL
-{
-  "username": "kjv",
-  "password": "forget"
 }
 EOL
 }

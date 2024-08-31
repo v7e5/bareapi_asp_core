@@ -1,10 +1,10 @@
 static class User {
 
   public static IResult Create(
-      HttpContext ctx, SqliteConnection conn, JsonElement o) {
-
-    if(o.ValueKind is not JsonValueKind.Object) {
-      return Results.BadRequest(new {error = "not an object"});
+    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+  ) {
+    if(!auth.IsAdmin(ctx)) {
+      return Results.BadRequest(new {error = "verboten"});
     }
 
     string? username = o._str("username");
@@ -34,51 +34,47 @@ static class User {
     return Results.Ok();
   }
 
-  public static IEnumerable<IDictionary<string, object>> List(
-      HttpContext ctx, SqliteConnection conn, JsonElement? o) {
-
-    long? id = null;
-    string? name = null;
-
-    if(o?.ValueKind is JsonValueKind.Object) {
-      id = o?._long("id");
-      name = o?._str("name");
+  public static IResult List(
+    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement? o
+  ) {
+    if(!auth.IsAdmin(ctx)) {
+      return Results.BadRequest(new {error = "verboten"});
     }
 
     using var cmd = conn.CreateCommand();
     cmd.CommandText = "select id, username from user where 1 ";
 
-    if(id is not null) {
+    if(o?._long("id") is long id) {
       cmd.CommandText += " and id=:id ";
       cmd.Parameters.AddWithValue("id", id);
     }
 
-    if(name is not null) {
-      cmd.CommandText += " and name = :name ";
-      cmd.Parameters.AddWithValue("name", name);
+    if(o?._str("username") is string username) {
+      cmd.CommandText += " and username = :username ";
+      cmd.Parameters.AddWithValue("username", username);
     }
 
-    return cmd.ExecuteReader().ToDictArray();
+    return Results.Ok(cmd.ExecuteReader().ToDictArray());
   }
 
-  public static IResult Delete
-    (HttpContext ctx, SqliteConnection conn, JsonElement o) {
-
-      if(o.ValueKind is not JsonValueKind.Object) {
-        return Results.BadRequest(new {error = "not an object"});
-      }
-
-      long? id = o._long("id");
-      if(id is null) {
-        return Results.BadRequest(new {error = "need an id"});
-      }
-
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = "delete from user where id = :id";
-      cmd.Parameters.AddWithValue("id", id);
-      cmd.ExecuteNonQuery();
-
-      return Results.Ok();
+  public static IResult Delete(
+    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+  ) {
+    if(!auth.IsAdmin(ctx)) {
+      return Results.BadRequest(new {error = "verboten"});
     }
+
+    long? id = o._long("id");
+    if(id is null) {
+      return Results.BadRequest(new {error = "need an id"});
+    }
+
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = "delete from user where id = :id";
+    cmd.Parameters.AddWithValue("id", id);
+    cmd.ExecuteNonQuery();
+
+    return Results.Ok();
+  }
 
 }
