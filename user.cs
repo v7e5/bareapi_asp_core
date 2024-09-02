@@ -8,27 +8,32 @@ static class User {
     }
 
     string? username = o._str("username");
-    //plain-text here for testing purposes, do not use in production
     string? passwd = o._str("passwd");
 
     if((username, passwd) is (null, null)) {
       return Results.BadRequest(new {error = "need a name and password"});
     }
 
+    using var ex_user = conn.CreateCommand();
+    ex_user.CommandText = "select id from user where username=:username";
+    ex_user.Parameters.AddWithValue("username", username);
+
+    if(ex_user.ExecuteScalar() is not null) {
+      return Results.BadRequest(new {error = "username already exists"});
+    }
+
+    byte[] salt = RandomNumberGenerator.GetBytes(16);
+    byte[] hash = deriveKey(password: passwd!, salt: salt);
+
     using var cmd = conn.CreateCommand();
     cmd.CommandText
       = "insert into user(username, passwd) values (:username, :passwd)";
 
     cmd.Parameters.AddWithValue("username", username);
-    cmd.Parameters.AddWithValue("passwd", passwd);
-
-    try {
-      cmd.ExecuteNonQuery();
-    } catch (SqliteException ex) {
-      return Results.BadRequest(new {
-        error = (ex.SqliteErrorCode == 19)
-          ? "username already exists" : ex.Message
-      });
+    cmd.Parameters.AddWithValue("passwd",
+      Convert.ToBase64String(salt) + ':' + Convert.ToBase64String(hash));
+    if(cmd.ExecuteNonQuery() == 0) {
+      return Results.BadRequest(new {error = "cannot create"});
     }
 
     return Results.Ok();
@@ -72,9 +77,35 @@ static class User {
     using var cmd = conn.CreateCommand();
     cmd.CommandText = "delete from user where id = :id";
     cmd.Parameters.AddWithValue("id", id);
-    cmd.ExecuteNonQuery();
+    if(cmd.ExecuteNonQuery() == 0) {
+      return Results.BadRequest(new {error = "cannot delete"});
+    }
 
     return Results.Ok();
   }
 
+  public static IResult ResetPass(
+    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+  ) {
+    string? passwd = o._str("passwd");
+    if(passwd is null) {
+      return Results.BadRequest(new {error = "need a password"});
+    }
+
+    byte[] salt = RandomNumberGenerator.GetBytes(16);
+    byte[] hash = deriveKey(password: passwd!, salt: salt);
+
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText
+      = "update user set passwd = :passwd where id = :id";
+    cmd.Parameters.AddWithValue("id", auth.GetCurrentUser(ctx));
+    cmd.Parameters.AddWithValue("passwd",
+      Convert.ToBase64String(salt) + ':' + Convert.ToBase64String(hash));
+
+    if(cmd.ExecuteNonQuery() == 0) {
+      return Results.BadRequest(new {error = "cannot reset"});
+    }
+
+    return Results.Ok();
+  }
 }

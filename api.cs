@@ -108,7 +108,6 @@ class XXX {
       }
 
       string? username = o._str("username");
-      //plain-text here for testing purposes, do not use in production
       string? passwd = o._str("passwd");
 
       if((username, passwd) is (null, null)) {
@@ -117,15 +116,24 @@ class XXX {
 
       using var user_cmd = conn.CreateCommand();
       user_cmd.CommandText
-        = "select id from user where username=:u and passwd=:p";
+        = "select id, passwd from user where username=:u";
       user_cmd.Parameters.AddWithValue("u", username);
-      user_cmd.Parameters.AddWithValue("p", passwd);
 
-      var userid = user_cmd.ExecuteScalar();
+      var user = user_cmd.ExecuteReader().ToDictArray().FirstOrDefault();
 
-      if(userid is null) {
+      if(user is null
+        || (((string) user["passwd"]).Split(':') is var arr
+          && !CryptographicOperations.FixedTimeEquals(
+          deriveKey(
+            password: passwd!,
+            salt: Convert.FromBase64String(arr[0])
+          ),
+          Convert.FromBase64String(arr[1])))
+        ) {
         return Results.BadRequest(new {error = "incorrect user/pass"});
       }
+
+      var userid = (long) user["id"];
 
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from session where userid=:u";
@@ -190,6 +198,7 @@ class XXX {
     _user.MapPost("/list",   User.List);
     _user.MapPost("/create", User.Create);
     _user.MapPost("/delete", User.Delete);
+    _user.MapPost("/resetpass", User.ResetPass);
 
     var _todo = app.MapGroup("/todo");
     _todo.MapPost("/list",   Todo.List);

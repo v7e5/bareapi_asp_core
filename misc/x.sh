@@ -20,16 +20,17 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
-    todo/list
-    todo/delete
-    user/create
-    user/delete
-    user/list
+    now
     login
     'logout'
+    user/resetpass
+    user/create
+    todo/list
+    todo/delete
+    user/delete
+    user/list
     todo/create
     az
-    now
     todo/update
     category/list
     category/create

@@ -6,6 +6,7 @@ global using System.Text.Json;
 global using System.Threading.Tasks;
 global using System.Collections.Frozen;
 global using System.Collections.Generic;
+global using System.Security.Cryptography;
 
 global using Microsoft.Data.Sqlite;
 

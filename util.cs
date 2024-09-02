@@ -52,6 +52,15 @@ static class Util {
     ._reverse(reverse)
     .ToArray();
 
+  public static byte[] deriveKey(string password, byte[] salt) =>
+    Rfc2898DeriveBytes.Pbkdf2(
+      password: password,
+      salt: salt,
+      iterations: 100000,
+      hashAlgorithm: HashAlgorithmName.SHA512,
+      outputLength: 32
+    );
+
   public static FrozenDictionary<string, JsonElement> fd(this JsonElement o) =>
     o.EnumerateObject().ToFrozenDictionary(kv => kv.Name, kv => kv.Value);
 

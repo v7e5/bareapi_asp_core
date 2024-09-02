@@ -7,6 +7,16 @@ cat <<EOL
 EOL
 }
 
+x() {
+cat <<EOL
+{
+  "username": "kjv",
+  "passwd": "xxxxxx"
+
+}
+EOL
+}
+
 kx() {
 cat <<EOL
 [
@@ -42,16 +52,6 @@ cat <<EOL
   "kcategories":[33 ],
   "kdue_to":  $(date --date=" 2023-10-7 6:30AM" +%s 2> /dev/null || echo -n null),
   "kdone": true
-}
-EOL
-}
-
-x() {
-cat <<EOL
-{
-  "username": "kjv",
-  "passwd": "forget"
-
 }
 EOL
 }
