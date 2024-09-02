@@ -20,6 +20,43 @@ routes using curl. Feel free to ignore them if they don't match your use case.
 
 ## Endpoints
 
+### Auth
+
+#### login
+POST: `/login`
+
+Example request:
+```shell
+curl -vs -X POST \
+  --cookie ${COOKIE_FILE_PATH} \
+  --cookie-jar ${COOKIE_FILE_PATH} \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json' \
+  --data-binary "$(cat <<EOL
+{
+  "username": string (required),
+  "passwd": string (required)
+}
+EOL
+)" \
+'http://0.0.0.0:8000/login'
+
+```
+
+#### logout
+POST: `/logout`
+
+Example request:
+```shell
+curl -vs -X POST \
+  --cookie ${COOKIE_FILE_PATH} \
+  --cookie-jar ${COOKIE_FILE_PATH} \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json' \
+'http://0.0.0.0:8000/logout'
+
+```
+
 ### Todos
 
 #### todo: list
@@ -44,7 +81,7 @@ will have recieved from an earlier request. To go back, send `cursor_prev`.
 The value for `cursor_init` does not change for a given query. It is used as an
 anchor to determine if there are any rows while going backwards.
 
-Sample request:
+Example request:
 ```shell
 curl -vs -X POST \
   --cookie ${COOKIE_FILE_PATH} \
@@ -72,36 +109,19 @@ EOL
 #### todo: create
 POST: `/todo/create`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "task": string (required),
   "done": bool (optional),
   "due": unix timestamp (long, optional),
   "categories": [array of category ids (long, optional)]
 }
-EOL
-)" \
-'http://0.0.0.0:8000/todo/create'
 ```
 
 #### todo: update
 POST: `/todo/update`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (required),
   "task": string,
@@ -109,65 +129,15 @@ curl -vs -X POST \
   "due": unix timestamp,
   "categories": [array of category ids]
 }
-EOL
-)" \
-'http://0.0.0.0:8000/todo/update'
 ```
 
 #### todo: delete
 POST: `/todo/delete`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (required)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/todo/delete'
-```
-
-### Auth
-
-#### login
-POST: `/login`
-
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
-{
-  "username": string (required),
-  "passwd": string (required)
-}
-EOL
-)" \
-'http://0.0.0.0:8000/login'
-
-```
-
-#### logout
-POST: `/logout`
-
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-'http://0.0.0.0:8000/logout'
-
 ```
 
 ### Users
@@ -175,59 +145,29 @@ curl -vs -X POST \
 #### user: create
 POST: `/user/create`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "username": string (required),
   "passwd": string (required)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/user/create'
 ```
 
 #### user: delete
 POST: `/user/delete`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (required)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/user/delete'
 ```
 #### user: list
 POST: `/user/list`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (optional),
   "username": string (optional)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/user/list'
 ```
 
 ### Categories
@@ -235,81 +175,40 @@ EOL
 #### category: create
 POST: `/category/create`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 [
   {"name":"bug","color":"d73a4a"},
   {"name":"duplicate","color":"cfd3d7"}
 ]
-EOL
-)" \
-'http://0.0.0.0:8000/category/create'
 ```
 
 #### category: list
 POST: `/category/list`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (optional),
   "name": string (optional),
   "color": string (optional)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/category/list'
 ```
 
 #### category: update
 POST: `/category/update`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (required),
   "name": string,
   "color": string
 }
-EOL
-)" \
-'http://0.0.0.0:8000/category/update'
 ```
 
 #### category: delete
 POST: `/category/delete`
 
-Sample request:
-```shell
-curl -vs -X POST \
-  --cookie ${COOKIE_FILE_PATH} \
-  --cookie-jar ${COOKIE_FILE_PATH} \
-  -H 'content-type: application/json' \
-  -H 'accept: application/json' \
-  --data-binary "$(cat <<EOL
+```json
 {
   "id": long (required)
 }
-EOL
-)" \
-'http://0.0.0.0:8000/category/delete'
 ```
-
