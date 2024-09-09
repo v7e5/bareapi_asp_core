@@ -25,6 +25,13 @@ static class Util {
       && v.TryGetInt64(out var i)
     ) ? i : null;
 
+  public static int? _int(this JsonElement j, string k) =>
+    (j.ValueKind is JsonValueKind.Object
+      && j.TryGetProperty(k, out var v)
+      && v.ValueKind is JsonValueKind.Number
+      && v.TryGetInt32(out var i)
+    ) ? i : null;
+
   public static bool? _bool(this JsonElement j, string k) =>
     (j.ValueKind is JsonValueKind.Object
       && j.TryGetProperty(k, out var v)

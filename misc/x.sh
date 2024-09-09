@@ -20,6 +20,7 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    hailstone
     now
     login
     'logout'

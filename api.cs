@@ -1,4 +1,7 @@
 ﻿class Auth: IMiddleware {
+  private static readonly string[] noauth = {
+    "login", "hailstone", "echo", "env", "now"
+  }; 
   private readonly HttpContext? ctx;
   private readonly SqliteConnection conn;
 
@@ -21,7 +24,7 @@
     cl($"[;38;5;27;1m[{ctx.Request.Path}][0m");
 
     if((this.GetCurrentUser() is not null)
-      || (ctx.Request.Path.ToString() == "/login")) {
+      || (noauth.Contains(ctx.Request.Path.ToString()[1..]))) {
       await nxt(ctx);
     } else {
       ctx.Response.StatusCode = 403;
@@ -85,6 +88,9 @@ class XXX {
     app.MapPost("/echo", (JsonElement o) => o);
 
     app.MapPost("/env", () => env());
+
+    app.MapPost("/hailstone", (JsonElement o) =>
+      ((o._int("n") is int n) && n > 0) ? collatz([n]) : null); 
 
     app.MapPost("/now", (
       Auth auth, SqliteConnection conn
