@@ -1,11 +1,13 @@
 ﻿class Auth: IMiddleware {
+  private readonly HttpContext? ctx;
   private readonly SqliteConnection conn;
 
-  public Auth(SqliteConnection _conn) => conn = _conn;
+  public Auth(IHttpContextAccessor acx, SqliteConnection conn) =>
+    (this.conn, this.ctx) = (conn, acx.HttpContext);
 
-  public long? GetCurrentUser(HttpContext ctx) {
-    if(ctx.Request.Cookies.TryGetValue("_id", out var k)) {
-      using var cmd = conn.CreateCommand();
+  public long? GetCurrentUser() {
+    if(this.ctx?.Request.Cookies.TryGetValue("_id", out var k) ?? false) {
+      using var cmd = this.conn.CreateCommand();
       cmd.CommandText = "select userid from session where id=:id";
       cmd.Parameters.AddWithValue("id", k);
       return (long?) cmd.ExecuteScalar();
@@ -13,12 +15,12 @@
     return null;
   }
 
-  public bool IsAdmin(HttpContext ctx) => this.GetCurrentUser(ctx) == 1;
+  public bool IsAdmin() => this.GetCurrentUser() == 1;
 
   public async Task InvokeAsync(HttpContext ctx, RequestDelegate nxt) {
     cl($"[;38;5;27;1m[{ctx.Request.Path}][0m");
 
-    if((this.GetCurrentUser(ctx) is not null)
+    if((this.GetCurrentUser() is not null)
       || (ctx.Request.Path.ToString() == "/login")) {
       await nxt(ctx);
     } else {
@@ -54,15 +56,16 @@ class XXX {
 
     builder.Services
       .AddRoutingCore()
-      .AddProblemDetails()
       .AddCors()
+      .AddHttpContextAccessor()
       .AddScoped(_ => {
         var conn = new SqliteConnection(
           builder.Configuration.GetValue<string>("dbconn"));
         conn.Open();
         return conn;
       })
-      .AddScoped<Auth>();
+      .AddScoped<Auth>()
+      .AddProblemDetails();
 
     var app = builder.Build();
 
@@ -84,25 +87,36 @@ class XXX {
     app.MapPost("/env", () => env());
 
     app.MapPost("/now", (
-      Auth auth, HttpContext ctx, SqliteConnection conn
+      Auth auth, SqliteConnection conn
     ) => {
       using var cmd = conn.CreateCommand();
-      cmd.CommandText = "select unixepoch()";
+      cmd.CommandText =
+      """
+      select
+        datetime('now', 'localtime') as local,
+        unixepoch() as unix_timestamp,
+        current_timestamp as unix_timestamp_str
+      """;
 
-      var db = (long?) cmd.ExecuteScalar();
-      var cs = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-      var ts = DateTimeOffset.FromUnixTimeSeconds(cs).ToString();
+      var ut = DateTimeOffset.UtcNow;
 
       return new {
-        db, cs, ts,
-        user = auth.GetCurrentUser(ctx)
+        user = auth.GetCurrentUser(),
+        server = new {
+          local = ut.ToLocalTime().ToString(),
+          unix_timestamp = ut.ToUnixTimeSeconds(),
+          unix_timestamp_str = ut.ToString()
+        },
+        database = cmd.ExecuteReader().ToDictArray().FirstOrDefault(),
+        ng = new NonGen().Cast<int>(),
+        cg = new ConGen()
       };
     });
 
     app.MapPost("/login", (
       HttpContext ctx, SqliteConnection conn, Auth auth, JsonElement o
     ) => {
-      if (auth.GetCurrentUser(ctx) is not null) {
+      if (auth.GetCurrentUser() is not null) {
         cl("logged in - skip");
         return Results.Ok();
       }
@@ -175,7 +189,7 @@ class XXX {
     ) => {
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from session where userid=:u";
-      sess_del.Parameters.AddWithValue("u", auth.GetCurrentUser(ctx));
+      sess_del.Parameters.AddWithValue("u", auth.GetCurrentUser());
       sess_del.ExecuteNonQuery();
 
       ctx.Response.Headers.Append(

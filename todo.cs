@@ -9,7 +9,7 @@ readonly record struct TodoO (
 static class Todo {
 
   public static IResult Create(
-    HttpContext ctx, Auth auth, SqliteConnection conn, TodoO todo) {
+    Auth auth, SqliteConnection conn, TodoO todo) {
     if(String.IsNullOrEmpty(todo.task?.Trim())) {
       return Results.BadRequest(new {error = "need a task"});
     }
@@ -29,7 +29,7 @@ static class Todo {
       cmd.Parameters.AddWithValue("done", todo.done ?? false);
       cmd.Parameters.AddWithValue("due",
         todo.due ?? DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-      cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser(ctx));
+      cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser());
 
       cmd.ExecuteNonQuery();
 
@@ -77,7 +77,7 @@ static class Todo {
   }
 
   public static IResult Update(
-    HttpContext ctx, Auth auth, SqliteConnection conn, TodoO todo) {
+    Auth auth, SqliteConnection conn, TodoO todo) {
     if(todo.id is null) {
       return Results.BadRequest(new {error = "need an id"});
     }
@@ -109,7 +109,7 @@ static class Todo {
       cmd.CommandText = cmd.CommandText.TrimEnd(',');
       cmd.CommandText += " where id = :id and userid = :userid";
       cmd.Parameters.AddWithValue("id", todo.id);
-      cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser(ctx));
+      cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser());
 
       if(cmd.ExecuteNonQuery() == 0) {
         return Results.BadRequest(new {error = "cannot update"});
@@ -160,7 +160,7 @@ static class Todo {
   }
 
   public static IResult List(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement? o) {
+    Auth auth, SqliteConnection conn, JsonElement? o) {
     long? cursor_init = o?._long("cursor_init");
     long? cursor_prev = o?._long("cursor_prev");
     long? cursor_next = o?._long("cursor_next");
@@ -231,7 +231,7 @@ static class Todo {
 
     cmd.CommandText +=
       $"and t.userid = :userid group by t.id order by t.id {dir} limit 10";
-    cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser(ctx));
+    cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser());
 
     var data = cmd.ExecuteReader().ToDictArray(!forward);
 
@@ -261,7 +261,7 @@ static class Todo {
   }
 
   public static IResult Delete(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o) {
+    Auth auth, SqliteConnection conn, JsonElement o) {
     long? id = o._long("id");
     if(id is null) {
       return Results.BadRequest(new {error = "need an id"});
@@ -270,7 +270,7 @@ static class Todo {
     using var cmd = conn.CreateCommand();
     cmd.CommandText = "delete from todo where id=:id and userid=:userid";
     cmd.Parameters.AddWithValue("id", id);
-    cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser(ctx));
+    cmd.Parameters.AddWithValue("userid", auth.GetCurrentUser());
 
     if(cmd.ExecuteNonQuery() == 0) {
       return Results.BadRequest(new {error = "cannot delete"});

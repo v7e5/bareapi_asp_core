@@ -23,6 +23,7 @@ ccc() {
     now
     login
     'logout'
+    category/list
     user/resetpass
     user/create
     todo/list
@@ -32,7 +33,6 @@ ccc() {
     todo/create
     az
     todo/update
-    category/list
     category/create
     category/delete
     category/update

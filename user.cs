@@ -1,9 +1,9 @@
 static class User {
 
   public static IResult Create(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+    Auth auth, SqliteConnection conn, JsonElement o
   ) {
-    if(!auth.IsAdmin(ctx)) {
+    if(!auth.IsAdmin()) {
       return Results.BadRequest(new {error = "verboten"});
     }
 
@@ -40,9 +40,9 @@ static class User {
   }
 
   public static IResult List(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement? o
+    Auth auth, SqliteConnection conn, JsonElement? o
   ) {
-    if(!auth.IsAdmin(ctx)) {
+    if(!auth.IsAdmin()) {
       return Results.BadRequest(new {error = "verboten"});
     }
 
@@ -63,9 +63,9 @@ static class User {
   }
 
   public static IResult Delete(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+    Auth auth, SqliteConnection conn, JsonElement o
   ) {
-    if(!auth.IsAdmin(ctx)) {
+    if(!auth.IsAdmin()) {
       return Results.BadRequest(new {error = "verboten"});
     }
 
@@ -85,7 +85,7 @@ static class User {
   }
 
   public static IResult ResetPass(
-    HttpContext ctx, Auth auth, SqliteConnection conn, JsonElement o
+    Auth auth, SqliteConnection conn, JsonElement o
   ) {
     string? passwd = o._str("passwd");
     if(passwd is null) {
@@ -98,7 +98,7 @@ static class User {
     using var cmd = conn.CreateCommand();
     cmd.CommandText
       = "update user set passwd = :passwd where id = :id";
-    cmd.Parameters.AddWithValue("id", auth.GetCurrentUser(ctx));
+    cmd.Parameters.AddWithValue("id", auth.GetCurrentUser());
     cmd.Parameters.AddWithValue("passwd",
       Convert.ToBase64String(salt) + ':' + Convert.ToBase64String(hash));
 

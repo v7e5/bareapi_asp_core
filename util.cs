@@ -94,17 +94,9 @@ static class Util {
       .Append(b).ToString();
   }
 
-  public static int[] collatz(int[] a) {
-    var i = a.Last();
-
-    if (i is 1) {
-      return a;
-    }
-
-    return collatz([
-      ..a,
-      (((i % 2) == 0) ? (i / 2) : ((3 * i) + 1))
-    ]);
-  }
+  public static int[] collatz(int[] a) => a[^1] switch {
+    1 => a, 
+    int n => collatz([..a, n % 2 == 0 ? n/2 : (3*n)+1])
+  };
 
 }
