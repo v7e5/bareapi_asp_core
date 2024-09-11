@@ -177,9 +177,10 @@ static class Todo {
         t.task,
         t.done,
         t.due_unix_timestamp,
-        json_group_array(
-          json_object('id', c.id, 'name', c.name, 'color', c.color)
-        ) as categories
+        iif((c.id is null), null,
+          json_group_array(
+            json_object('id', c.id, 'name', c.name, 'color', c.color)
+          )) as categories
       from todo t
         left join category_todo ct on t.id = ct.todoid
         left join category c on c.id = ct.categoryid
@@ -237,7 +238,7 @@ static class Todo {
 
     cursor_prev = cursor_next = null;
     if(data.Length != 0) {
-      cursor_prev = (long) data[0]["id"];
+      cursor_prev = (long?) data[0]["id"];
 
       if(cursor == null) {
         cursor_init = cursor_prev;
@@ -248,7 +249,7 @@ static class Todo {
       }
 
       if(data.Length == 10) {
-        cursor_next = (long) data[^1]["id"];
+        cursor_next = (long?) data[^1]["id"];
       }
     }
 

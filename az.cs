@@ -28,7 +28,7 @@ static class AZ {
 
     cursor_prev = cursor_next = null;
     if(data.Length != 0) {
-      cursor_prev = (long) data[0]["id"];
+      cursor_prev = (long?) data[0]["id"];
 
       if(cursor == null) {
         cursor_init = cursor_prev;
@@ -39,7 +39,7 @@ static class AZ {
       }
 
       if(data.Length == 10) {
-        cursor_next = (long) data[^1]["id"];
+        cursor_next = (long?) data[^1]["id"];
       }
     }
 

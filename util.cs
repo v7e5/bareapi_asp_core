@@ -50,12 +50,13 @@ static class Util {
     this IEnumerable<T> source, bool reverse = true
   ) => reverse ? source.Reverse() : source;
 
-  public static IDictionary<string, object>[] ToDictArray(
+  public static IDictionary<string, object?>[] ToDictArray(
     this SqliteDataReader reader, bool reverse = false
   ) => reader
     .Cast<IDataRecord>()
     .Select(e => Enumerable.Range(0, e.FieldCount)
-      .ToDictionary(e.GetName, e.GetValue))
+      .ToDictionary(e.GetName,  (int i) =>
+        (e.GetValue(i) is var x && x == DBNull.Value) ? null : x))
     ._reverse(reverse)
     .ToArray();
 

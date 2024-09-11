@@ -142,7 +142,7 @@ class XXX {
       var user = user_cmd.ExecuteReader().ToDictArray().FirstOrDefault();
 
       if(user is null
-        || (((string) user["passwd"]).Split(':') is var arr
+        || (user["passwd"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
           deriveKey(
             password: passwd!,
@@ -153,7 +153,7 @@ class XXX {
         return Results.BadRequest(new {error = "incorrect user/pass"});
       }
 
-      var userid = (long) user["id"];
+      var userid = (long?) user["id"];
 
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from session where userid=:u";
