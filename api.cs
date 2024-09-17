@@ -1,7 +1,7 @@
 ﻿class Auth: IMiddleware {
   private static readonly string[] noauth = {
     "login", "hailstone", "echo", "env", "now"
-  }; 
+  };
   private readonly HttpContext? ctx;
   private readonly SqliteConnection conn;
 
@@ -215,9 +215,10 @@ class XXX {
     _category.MapPost("/delete", Category.Delete);
 
     var _user = app.MapGroup("/user");
-    _user.MapPost("/list",   User.List);
-    _user.MapPost("/create", User.Create);
-    _user.MapPost("/delete", User.Delete);
+    _user.MapPost("/list",      User.List);
+    _user.MapPost("/create",    User.Create);
+    _user.MapPost("/delete",    User.Delete);
+    _user.MapPost("/profile",   User.Profile);
     _user.MapPost("/resetpass", User.ResetPass);
 
     var _todo = app.MapGroup("/todo");

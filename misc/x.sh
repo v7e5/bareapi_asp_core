@@ -20,8 +20,9 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
-    hailstone
+    user/profile
     now
+    hailstone
     login
     'logout'
     category/list

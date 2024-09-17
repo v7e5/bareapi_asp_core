@@ -108,4 +108,14 @@ static class User {
 
     return Results.Ok();
   }
+
+  public static IResult Profile(
+    Auth auth, SqliteConnection conn
+  ) {
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = "select id, username from user where id=:id";
+    cmd.Parameters.AddWithValue("id", auth.GetCurrentUser());
+
+    return Results.Ok(cmd.ExecuteReader().ToDictArray());
+  }
 }
