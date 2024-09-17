@@ -31,16 +31,16 @@ sealed class NonGen: System.Collections.IEnumerable {
   }
 }
 
-sealed class ConGen: IEnumerable<int> {
-  int[] data = {3, 2, 1};
+sealed class ConGen: IEnumerable<char> {
+  string data = "abcdefghijklmnopqrstuvwxyz";
 
-  public IEnumerator<int> GetEnumerator() => new Rator(this);
+  public IEnumerator<char> GetEnumerator() => new Rator(this);
 
   System.Collections.IEnumerator
     System.Collections.IEnumerable.GetEnumerator() =>
       throw new Exception("non gen n/a");
 
-  class Rator: IEnumerator<int> {
+  class Rator: IEnumerator<char> {
     ConGen collection;
     int currentIndex = -1;
 
@@ -51,7 +51,7 @@ sealed class ConGen: IEnumerable<int> {
       return ++currentIndex < collection.data.Length;
     }
 
-    public int Current => collection.data [currentIndex];
+    public char Current => collection.data [currentIndex];
 
     public void Reset() => currentIndex = -1;
 

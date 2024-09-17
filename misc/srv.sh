@@ -7,11 +7,13 @@ set -euo pipefail
 
 
 purge() {
-  rm -rf bin obj
+  #rm -rf bin obj
+  #dotnet clean -c Release api.csproj
 }
 
 bld() {
-  dotnet build -r linux-x64 -c Release api.csproj
+  dotnet build --source ${HOME}./nuget/packages \
+    -r linux-x64 -c Release api.csproj
 }
 
 xxx() {
