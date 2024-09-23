@@ -113,9 +113,11 @@ static class User {
     Auth auth, SqliteConnection conn
   ) {
     using var cmd = conn.CreateCommand();
-    cmd.CommandText = "select id, username from user where id=:id";
+    cmd.CommandText = "select id, username as name from user where id=:id";
     cmd.Parameters.AddWithValue("id", auth.GetCurrentUser());
 
-    return Results.Ok(cmd.ExecuteReader().ToDictArray());
+    return Results.Ok(new {
+      user = cmd.ExecuteReader().ToDictArray().FirstOrDefault()
+    });
   }
 }
