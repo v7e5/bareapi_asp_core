@@ -1,4 +1,4 @@
-﻿namespace util;
+namespace util;
 
 static class Util {
 

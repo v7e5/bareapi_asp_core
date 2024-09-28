@@ -1,4 +1,4 @@
-﻿class Auth: IMiddleware {
+class Auth: IMiddleware {
   private static readonly string[] noauth = {
     "login", "hailstone", "echo", "env", "now"
   };
