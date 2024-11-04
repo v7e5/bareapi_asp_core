@@ -20,9 +20,10 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    hailstone
+    env
     user/profile
     now
-    hailstone
     login
     'logout'
     category/list
@@ -42,16 +43,32 @@ ccc() {
     env
   )
 
-  #-o /dev/null \
-  #--write-out "@./write_out_fmt.yml" \
-  #--data-binary "$(./misc/q.sh -x)" \
-  curl -vs -X POST \
-    --cookie ${cke} \
-    --cookie-jar ${cke} \
-    -H 'content-type: application/json' \
-    -H 'accept: application/json' \
-    --data-binary "$(./misc/q.sh -x)" \
-    'http://0.0.0.0:8000/'${a[1]} | jq
+  local u='http://0.0.0.0:8000/'${a[1]}
+
+  local m=l
+
+  if [[ ${m} == p ]]; then
+
+    cl -o -f 4 ${u}'\n'
+
+    curl -vs -X POST \
+      --cookie ${cke} \
+      --cookie-jar ${cke} \
+      -H 'content-type: application/json' \
+      -H 'accept: application/json' \
+      --data-binary "$(./misc/q.sh -x)" ${u} | jq
+  else
+    u=${u}'?'$(./misc/q.sh -x \
+        | node -r fs -e 'process.stdout.write(('\
+'new URLSearchParams(JSON.parse(fs.readFileSync(0, "utf-8")))).toString())')
+
+    cl -o -f 3 ${u}'\n'
+
+    curl -vs -X GET \
+      --cookie ${cke} \
+      --cookie-jar ${cke} \
+      -H 'accept: application/json' ${u} | jq
+  fi
 }
 
 w() {

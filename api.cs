@@ -96,8 +96,12 @@ class XXX {
 
     app.MapPost("/env", () => env());
 
+    app.MapGet("/env", () => env());
+
     app.MapPost("/hailstone", (JsonElement o) =>
       ((o._int("n") is int n) && n > 0) ? collatz([n]) : null); 
+
+    app.MapGet("/hailstone", (int n) => (n > 0) ? collatz([n]) : null); 
 
     app.MapPost("/now", (
       Auth auth, SqliteConnection conn
