@@ -10,6 +10,16 @@ quote table tabs tcl
 
 .tables
 
+*/
+.mode table
+
+select * from color limit 20;
+
+/*
+alter table user rename column passwd to password;
+
+select * from user;
+
 select
   t.id, t.task, t.done, t.due_unix_timestamp,
   json_group_array(
@@ -27,8 +37,11 @@ select id, task, done, datetime(due_unix_timestamp, 'unixepoch')
 
 
 update todo set task = 'centum' where id = 100;
+
 */
 
+
+/*
 select * from category_todo where categoryid=8;
 select
   t.id,
@@ -46,6 +59,7 @@ where 1
   and ct.categoryid in (3)
   and t.userid = 3
 group by t.id order by t.id asc 
+*/
 
 
 /*

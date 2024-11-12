@@ -38,7 +38,7 @@ curl -vs -X POST \
   --data-binary "$(cat <<EOL
 {
   "username": string (required),
-  "passwd": string (required)
+  "password": string (required)
 }
 EOL
 )" \
@@ -151,7 +151,7 @@ POST: `/user/create`
 ```json
 {
   "username": string (required),
-  "passwd": string (required)
+  "password": string (required)
 }
 ```
 

@@ -12,7 +12,7 @@ cat <<EOL
 {
   "n": 3,
   "username": "admin",
-  "passwd": "forget"
+  "password": "forget"
 
 }
 EOL

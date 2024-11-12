@@ -139,24 +139,24 @@ class XXX {
       }
 
       string? username = o._str("username");
-      string? passwd = o._str("passwd");
+      string? password = o._str("password");
 
-      if((username, passwd) is (null, null)) {
+      if((username, password) is (null, null)) {
         return Results.BadRequest(new {error = "need a name and password"});
       }
 
       using var user_cmd = conn.CreateCommand();
       user_cmd.CommandText
-        = "select id, passwd from user where username=:u";
+        = "select id, password from user where username=:u";
       user_cmd.Parameters.AddWithValue("u", username);
 
       var user = user_cmd.ExecuteReader().ToDictArray().FirstOrDefault();
 
       if(user is null
-        || (user["passwd"]?.ToString()?.Split(':') is string[] arr
+        || (user["password"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
           deriveKey(
-            password: passwd!,
+            password: password!,
             salt: Convert.FromBase64String(arr[0])
           ),
           Convert.FromBase64String(arr[1])))
@@ -237,6 +237,9 @@ class XXX {
     _todo.MapPost("/create", Todo.Create);
     _todo.MapPost("/update", Todo.Update);
     _todo.MapPost("/delete", Todo.Delete);
+
+    var _color = app.MapGroup("/color");
+    _color.MapPost("/list",   Color.List);
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

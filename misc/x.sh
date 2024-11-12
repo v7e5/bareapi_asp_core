@@ -20,11 +20,12 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    color/list
+    login
     hailstone
     env
     user/profile
     now
-    login
     'logout'
     category/list
     user/resetpass
@@ -45,7 +46,7 @@ ccc() {
 
   local u='http://0.0.0.0:8000/'${a[1]}
 
-  local m=l
+  local m=p
 
   if [[ ${m} == p ]]; then
 

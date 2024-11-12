@@ -3,7 +3,7 @@ begin transaction;
 create table user (
   id integer primary key,
   username text not null unique,
-  passwd text
+  password text
 );
 create table session (
   id text primary key,
@@ -39,5 +39,12 @@ create table az (
   id integer primary key,
   letter text not null,
   due integer not null
+);
+create table color (
+  id integer primary key,
+  grupo text not null,
+  hex text not null,
+  grade integer not null,
+  vivid integer not null
 );
 commit;

@@ -8,9 +8,9 @@ static class User {
     }
 
     string? username = o._str("username");
-    string? passwd = o._str("passwd");
+    string? password = o._str("password");
 
-    if((username, passwd) is (null, null)) {
+    if((username, password) is (null, null)) {
       return Results.BadRequest(new {error = "need a name and password"});
     }
 
@@ -23,14 +23,14 @@ static class User {
     }
 
     byte[] salt = RandomNumberGenerator.GetBytes(16);
-    byte[] hash = deriveKey(password: passwd!, salt: salt);
+    byte[] hash = deriveKey(password: password!, salt: salt);
 
     using var cmd = conn.CreateCommand();
     cmd.CommandText
-      = "insert into user(username, passwd) values (:username, :passwd)";
+      = "insert into user(username, password) values (:username, :password)";
 
     cmd.Parameters.AddWithValue("username", username);
-    cmd.Parameters.AddWithValue("passwd",
+    cmd.Parameters.AddWithValue("password",
       Convert.ToBase64String(salt) + ':' + Convert.ToBase64String(hash));
     if(cmd.ExecuteNonQuery() == 0) {
       return Results.BadRequest(new {error = "cannot create"});
@@ -87,19 +87,19 @@ static class User {
   public static IResult ResetPass(
     Auth auth, SqliteConnection conn, JsonElement o
   ) {
-    string? passwd = o._str("passwd");
-    if(passwd is null) {
+    string? password = o._str("password");
+    if(password is null) {
       return Results.BadRequest(new {error = "need a password"});
     }
 
     byte[] salt = RandomNumberGenerator.GetBytes(16);
-    byte[] hash = deriveKey(password: passwd!, salt: salt);
+    byte[] hash = deriveKey(password: password!, salt: salt);
 
     using var cmd = conn.CreateCommand();
     cmd.CommandText
-      = "update user set passwd = :passwd where id = :id";
+      = "update user set password = :password where id = :id";
     cmd.Parameters.AddWithValue("id", auth.GetCurrentUser());
-    cmd.Parameters.AddWithValue("passwd",
+    cmd.Parameters.AddWithValue("password",
       Convert.ToBase64String(salt) + ':' + Convert.ToBase64String(hash));
 
     if(cmd.ExecuteNonQuery() == 0) {
