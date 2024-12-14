@@ -1,6 +1,7 @@
 class Auth: IMiddleware {
   private static readonly string[] noauth = {
-    "login", "hailstone", "echo", "env", "now"
+    "login", "hailstone", "echo", "env", "now", "cg",
+    "pdf" , "img"
   };
   private readonly HttpContext? ctx;
   private readonly SqliteConnection conn;
@@ -94,9 +95,44 @@ class XXX {
       };
     });
 
+    app.MapPost("/cg", () => new ConGen());
+
     app.MapPost("/env", () => env());
 
-    app.MapGet("/env", () => env());
+    app.MapGet("/env", async (int? n) => {
+      if(n is not null) {
+        await Task.Delay((int) n);
+      }
+
+      return env();
+    });
+
+    static async Task _pdf(IWebHostEnvironment env, HttpContext ctx) {
+      ctx.Response.ContentType = "application/pdf";
+
+      using (var fs = new FileStream(
+        Path.Combine(env.WebRootPath, "thinkpad_e14_gen_2_amd_spec.pdf"),
+        FileMode.Open, FileAccess.Read
+      )) {
+        await fs.CopyToAsync(ctx.Response.Body);
+      }
+    }
+
+    static async Task _img(IWebHostEnvironment env, HttpContext ctx) {
+      ctx.Response.ContentType = "image/png";
+
+      using (var fs = new FileStream(
+        Path.Combine(env.WebRootPath, "tabriz.png"),
+        FileMode.Open, FileAccess.Read
+      )) {
+        await fs.CopyToAsync(ctx.Response.Body);
+      }
+    }
+
+    app.MapGet("/pdf", _pdf);
+    app.MapPost("/pdf", _pdf);
+    app.MapGet("/img", _img);
+    app.MapPost("/img", _img);
 
     app.MapPost("/hailstone", (JsonElement o) =>
       ((o._int("n") is int n) && n > 0) ? collatz([n]) : null); 
@@ -192,7 +228,7 @@ class XXX {
 
           ctx.Response.Headers.Append(
             "set-cookie", "_id=" + g
-            + ";domain=0.0.0.0;path=/;httponly;samesite=lax;max-age=604800"
+            + ";path=/;httponly;samesite=lax;max-age=604800"
           );
           break;
         }
@@ -210,8 +246,7 @@ class XXX {
       sess_del.ExecuteNonQuery();
 
       ctx.Response.Headers.Append(
-        "set-cookie", "_id="
-        + ";domain=0.0.0.0;path=/;httponly;samesite=lax;max-age=0"
+        "set-cookie", "_id=;path=/;httponly;samesite=lax;max-age=0"
       );
 
       return Results.Ok();

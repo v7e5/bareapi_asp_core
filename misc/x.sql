@@ -13,9 +13,57 @@ quote table tabs tcl
 */
 .mode table
 
-select * from color limit 20;
+
+
+select * from dummy;
 
 /*
+
+create table dummy (
+  id integer primary key,
+  word text not null
+);
+insert into dummy(word) values
+('abdomen'),
+('baching'),
+('cabezon'),
+('dabster'),
+('earbuds'),
+('fablers'),
+('gabfest'),
+('habited'),
+('iceboat'),
+('jabirus'),
+('kacheri'),
+('labored'),
+('machers'),
+('nackets'),
+('oakiest'),
+('pablums'),
+('qindars'),
+('rabidly'),
+('sabeing'),
+('taberds'),
+('ugliest'),
+('vacking'),
+('wabster'),
+('xanthic'),
+('yachted'),
+('zabtieh');
+
+select
+  c.id, c.grupo, c.hex, c.grade, c.vivid
+from color c where 1 
+  and (
+      c.id like %10%
+      or c.grupo like '%ff%'
+      or c.hex like '%ass%'
+      or c.grade like '%ass%'
+    )
+group by c.id order by c.id asc
+
+
+  and c.id > 105
 alter table user rename column passwd to password;
 
 select * from user;

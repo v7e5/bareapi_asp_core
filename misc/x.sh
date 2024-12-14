@@ -2,6 +2,7 @@
 set -euo pipefail
 
 cke='./misc/cookie'
+[[ ! -f ${cke} ]] && touch ${cke}
 
 bulk() {
   while IFS= read -r l; do
@@ -15,13 +16,15 @@ bulk() {
   done <./misc/todo_2.txt
 }
 
-ccc() {
-  local _i=0
-  [[ ! -f ${cke} ]] && touch ${cke}
-
+req() {
+  local m=p
   local a=(
-    color/list
+    echo
+    img
+    pdf
     login
+    env
+    color/list
     hailstone
     env
     user/profile
@@ -46,29 +49,29 @@ ccc() {
 
   local u='http://0.0.0.0:8000/'${a[1]}
 
-  local m=p
+  local q=$(./misc/q.sh ${a[1]})
 
   if [[ ${m} == p ]]; then
-
-    cl -o -f 4 ${u}'\n'
+    cl -o -b 17 -f 14 ${u}'\n'
 
     curl -vs -X POST \
       --cookie ${cke} \
       --cookie-jar ${cke} \
       -H 'content-type: application/json' \
       -H 'accept: application/json' \
-      --data-binary "$(./misc/q.sh -x)" ${u} | jq
+      --data-binary ${q} -- ${u} | jq
   else
-    u=${u}'?'$(./misc/q.sh -x \
-        | node -r fs -e 'process.stdout.write(('\
-'new URLSearchParams(JSON.parse(fs.readFileSync(0, "utf-8")))).toString())')
+    if [[ ${q} != '{}' ]]; then
+      u=${u}'?'$(echo -n ${q} \
+        | tr -d '[:space:]' | tr ',' '&' | tr ':' '=' \
+        | sed -e 's/{\([^}]\+\)}/\1/' | tr -d '"')
+    fi
 
-    cl -o -f 3 ${u}'\n'
+    cl -o -b 17 -f 15 ${u}'\n'
 
     curl -vs -X GET \
       --cookie ${cke} \
-      --cookie-jar ${cke} \
-      -H 'accept: application/json' ${u} | jq
+      --cookie-jar ${cke} -- ${u}
   fi
 }
 
@@ -86,8 +89,8 @@ w() {
           cl -b 27  -f 51 -o '------------------------------------------------'
           echo
           case ${f} in
-            x.sh) ./misc/x.sh -c || :;;
-            q.sh) ./misc/x.sh -c || :;;
+            x.sh) ./misc/x.sh -r || :;;
+            q.sh) ./misc/x.sh -r || :;;
             x.sql) cat ./misc/${f} | sqlite3 api.db || :;;
           esac
         fi

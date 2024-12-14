@@ -1,16 +1,9 @@
 #!/usr/bin/zsh
 set -euo pipefail
 
-kx() {
-cat <<EOL
-{}
-EOL
-}
-
-x() {
+login() {
 cat <<EOL
 {
-  "n": 3,
   "username": "admin",
   "password": "forget"
 
@@ -18,52 +11,7 @@ cat <<EOL
 EOL
 }
 
-kx() {
-cat <<EOL
-[
-  {"name": "abc", "color": "ff0000"},
-  null,
-  {"name": "def", "color": "00ff00"},
-  {"name": "ghi", "color": "0000ff"},
-  111,
-  {"name": "jkl", "color": "000000"}
-]
-EOL
-}
-
-kx() {
-cat <<EOL
-{
-  "id": 3,
-  "ktask": "dummy",
-  "kdue":  $(date --date=" 2024-8-31 6:30AM" +%s 2> /dev/null || echo -n null),
-  "kdone": false,
-  "kcategories":[71, 31]
-}
-EOL
-}
-
-kx() {
-cat <<EOL
-{
-  "kid": 1,
-  "cursor_init": 63,
-  "cursor_next": 102,
-  "kcursor_prev": 11,
-  "kcategories":[33 ],
-  "kdue_to":  $(date --date=" 2023-10-7 6:30AM" +%s 2> /dev/null || echo -n null),
-  "kdone": true
-}
-EOL
-}
-
-kx() {
-  cat ./misc/category.json
-}
-
-
-
-kx() {
+echo() {
 cat <<EOL
 {
   "boolt": true,
@@ -96,16 +44,46 @@ cat <<EOL
 EOL
 }
 
-_k=(${(ok)functions:#_*})
-_v=(${(oM)_k#[a-z]*})
-typeset -A _o
-_o=(${_v:^_k})
 
-eval 'zparseopts -D -E -F -a _a '${_v}
+kx() {
+cat <<EOL
+[
+  {"name": "abc", "color": "ff0000"},
+  null,
+  {"name": "def", "color": "00ff00"},
+  {"name": "ghi", "color": "0000ff"},
+  111,
+  {"name": "jkl", "color": "000000"}
+]
+EOL
+}
 
-[[ ${#_a} -eq 0  ]] && \
-  paste -d ' ' <(print -l '\-'${(j:\n-:)_v}) <(print -l ${_k}) && exit
+kx() {
+cat <<EOL
+{
+  "id": 3,
+  "ktask": "dummy",
+  "kdue":  $(date --date=" 2024-8-31 6:30AM" +%s 2> /dev/null || echo -n null),
+  "kdone": false,
+  "kcategories":[71, 31]
+}
+EOL
+}
 
-_a=('$_o['${^_a#-}']')
-eval ${(F)_a}
+x() {
+cat <<EOL
+{
+  "n": 10000,
+  "cursor_init": 1,
+  "cursor_next": 374,
+  "filter_text" : "ff"
+}
+EOL
+}
+
+
+_k=(${(k)functions})
+
+(( ${_k[(Ie)${@}]} )) && eval ${@} || echo -n '{}'
+
 exit
