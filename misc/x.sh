@@ -19,12 +19,13 @@ bulk() {
 req() {
   local m=p
   local a=(
+    color/list
+    color/group
     echo
     img
     pdf
     login
     env
-    color/list
     hailstone
     env
     user/profile
@@ -50,6 +51,7 @@ req() {
   local u='http://0.0.0.0:8000/'${a[1]}
 
   local q=$(./misc/q.sh ${a[1]})
+  echo ${q}
 
   if [[ ${m} == p ]]; then
     cl -o -b 17 -f 14 ${u}'\n'

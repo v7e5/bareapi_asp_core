@@ -11,6 +11,17 @@ cat <<EOL
 EOL
 }
 
+color/list() {
+cat <<EOL
+{
+  "xcursor_init": 248,
+  "xcursor_next": 277,
+  "filter_text": "ellow"
+
+}
+EOL
+}
+
 echo() {
 cat <<EOL
 {

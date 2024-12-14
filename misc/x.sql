@@ -15,7 +15,7 @@ quote table tabs tcl
 
 
 
-select * from dummy;
+select * from color limit 1;
 
 /*
 

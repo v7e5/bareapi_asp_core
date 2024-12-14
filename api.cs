@@ -275,6 +275,7 @@ class XXX {
 
     var _color = app.MapGroup("/color");
     _color.MapPost("/list",   Color.List);
+    _color.MapPost("/group",   Color.Group);
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

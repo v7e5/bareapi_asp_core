@@ -1,4 +1,16 @@
 static class Color {
+  public static IResult Group(SqliteConnection conn) {
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = """
+      select c.grupo from color c group by c.grupo
+      """;
+    var data = cmd.ExecuteReader()
+      .ToDictArray()
+      .Select(e => e["grupo"]?.ToString()?.Split('-')[0])
+      .Distinct()
+      .OrderBy(s => s);
+    return Results.Ok(new { data });
+  }
 
   public static IResult List(SqliteConnection conn, JsonElement? o) {
     long? cursor_init = o?._long("cursor_init");
@@ -6,7 +18,6 @@ static class Color {
     long? cursor_next = o?._long("cursor_next");
     string? filter_text = o?._str("filter_text");
     int? limit = o?._int("limit") ?? 10;
-    cl(cursor_next);
     long? cursor = cursor_next ?? cursor_prev;
     bool forward = cursor_prev == null;
     var(op, dir) = forward ? (">", "asc"): ("<", "desc");
