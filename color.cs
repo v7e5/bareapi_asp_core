@@ -68,12 +68,12 @@ static class Color {
     }
 
     return Results.Ok(
-      new {
-        data,
-        cursor_init,
-        cursor_prev,
-        cursor_next,
-      }
-    );
+    new {
+      data,
+      cursor_init,
+      cursor_prev,
+      cursor_next,
+    }
+      );
   }
 }

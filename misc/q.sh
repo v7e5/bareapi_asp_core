@@ -15,7 +15,7 @@ color/list() {
 cat <<EOL
 {
   "xcursor_init": 248,
-  "xcursor_next": 277,
+  "xcursor_next": 124,
   "filter_text": "ellow"
 
 }

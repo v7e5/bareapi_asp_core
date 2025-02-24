@@ -20,11 +20,11 @@ req() {
   local m=p
   local a=(
     color/list
+    login
     color/group
     echo
     img
     pdf
-    login
     env
     hailstone
     env
