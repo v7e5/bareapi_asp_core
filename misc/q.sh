@@ -14,9 +14,10 @@ EOL
 color/list() {
 cat <<EOL
 {
-  "xcursor_init": 248,
-  "xcursor_next": 124,
-  "filter_text": "ellow"
+  "xcursor_init": 1,
+  "xcursor_next": 10,
+  "cursor_prev": 10,
+  "xilter_text": "ellow"
 
 }
 EOL

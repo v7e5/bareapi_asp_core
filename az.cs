@@ -13,7 +13,7 @@ static class AZ {
     cmd.CommandText =
       """
       select
-        id, letter, due
+        id, word
       from az where 1
       """;
 
