@@ -7,7 +7,13 @@ static class Util {
   }
 
   public static void z<T>(this T t) {
-    Console.WriteLine(t);
+    var ct = t?.GetType();
+    var rt = typeof(T);
+    cl(ct?.GetType());
+    cl(rt.GetType());
+    cl(rt is System.Type);
+    cl(ct is System.Type);
+    cl($"{ct} : {rt}");
   }
 
   public static string? _str(this JsonElement j, string k) =>

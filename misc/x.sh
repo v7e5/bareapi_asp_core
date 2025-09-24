@@ -4,6 +4,87 @@ set -euo pipefail
 cke='./misc/cookie'
 [[ ! -f ${cke} ]] && touch ${cke}
 
+getpost=
+
+get() {
+  local a=(
+    env
+    hailstone
+    img
+    pdf
+  )
+
+  local u='http://0.0.0.0:8000/'${a[1]}
+  local q=$(./misc/q.sh ${a[1]})
+
+  if [[ ${q} != '{}' ]]; then
+    u=${u}'?'$(echo -n ${q} \
+      | tr -d '[:space:]' | tr ',' '&' | tr ':' '=' \
+      | sed -e 's/{\([^}]\+\)}/\1/' | tr -d '"')
+  fi
+
+  cl -o -b 17 -f 15 ${u}'\n'
+
+
+  curl -vs -X GET \
+    --cookie ${cke} \
+    --cookie-jar ${cke} -- ${u}
+}
+
+post() {
+  echo 'poss'
+
+  local a=(
+    cg
+    ecco
+    env
+    hailstone
+    img
+    now
+    pdf
+
+    login
+    logout
+
+    az
+
+    category/create
+    category/delete
+    category/list
+    category/update
+
+    color/group
+    color/list
+
+    todo/create
+    todo/delete
+    todo/list
+    todo/update
+
+    user/create
+    user/delete
+    user/list
+    user/profile
+    user/resetpass
+  )
+
+  local u='http://0.0.0.0:8000/'${a[1]}
+  local q=$(./misc/q.sh ${a[1]})
+
+  cl -o -b 17 -f 14 ${u}'\n'
+
+  curl -s -X POST \
+    --cookie ${cke} \
+    --cookie-jar ${cke} \
+    -H 'content-type: application/json' \
+    -H 'accept: application/json' \
+    --data-binary ${q} -- ${u} | jq
+}
+
+req() {
+  [[ -v getpost ]] && post || get
+}
+
 bulk() {
   while IFS= read -r l; do
     curl -vs -X POST \
@@ -14,67 +95,6 @@ bulk() {
       --data-binary "${l}" \
       'http://0.0.0.0:8000/todo/create' || :
   done <./misc/todo_2.txt
-}
-
-req() {
-  local m=p
-  local a=(
-    color/list
-    login
-    color/group
-    echo
-    img
-    pdf
-    env
-    hailstone
-    env
-    user/profile
-    now
-    'logout'
-    category/list
-    user/resetpass
-    user/create
-    todo/list
-    todo/delete
-    user/delete
-    user/list
-    todo/create
-    az
-    todo/update
-    category/create
-    category/delete
-    category/update
-    'echo'
-    env
-  )
-
-  local u='http://0.0.0.0:8000/'${a[1]}
-
-  local q=$(./misc/q.sh ${a[1]})
-  echo ${q}
-
-  if [[ ${m} == p ]]; then
-    cl -o -b 17 -f 14 ${u}'\n'
-
-    curl -vs -X POST \
-      --cookie ${cke} \
-      --cookie-jar ${cke} \
-      -H 'content-type: application/json' \
-      -H 'accept: application/json' \
-      --data-binary ${q} -- ${u} | jq
-  else
-    if [[ ${q} != '{}' ]]; then
-      u=${u}'?'$(echo -n ${q} \
-        | tr -d '[:space:]' | tr ',' '&' | tr ':' '=' \
-        | sed -e 's/{\([^}]\+\)}/\1/' | tr -d '"')
-    fi
-
-    cl -o -b 17 -f 15 ${u}'\n'
-
-    curl -vs -X GET \
-      --cookie ${cke} \
-      --cookie-jar ${cke} -- ${u}
-  fi
 }
 
 w() {

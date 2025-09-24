@@ -7,7 +7,7 @@ set -euo pipefail
 
 
 purge() {
-  #rm -rf bin obj
+  rm -rfv bin obj
   #dotnet clean -c Release api.csproj
 }
 

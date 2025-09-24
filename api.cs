@@ -1,6 +1,6 @@
 class Auth: IMiddleware {
   private static readonly string[] noauth = {
-    "login", "hailstone", "echo", "env", "now", "cg",
+    "login", "hailstone", "ecco", "env", "now", "cg",
     "pdf" , "img"
   };
   private readonly HttpContext? ctx;
@@ -84,7 +84,7 @@ class XXX {
     app.UseExceptionHandler();
     app.UseDeveloperExceptionPage();
 
-    app.MapPost("/echo", async (JsonElement? o) => {
+    app.MapPost("/ecco", async (JsonElement? o) => {
       if(o?._int("delay") is int n && n > 0) {
         await Task.Delay(n);
       }

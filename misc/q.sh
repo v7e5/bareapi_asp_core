@@ -11,19 +11,118 @@ cat <<EOL
 EOL
 }
 
-color/list() {
+hailstone() {
 cat <<EOL
 {
-  "xcursor_init": 1,
-  "xcursor_next": 10,
-  "cursor_prev": 10,
-  "xilter_text": "ellow"
-
+  "n": 3
 }
 EOL
 }
 
-echo() {
+az() {
+cat <<EOL
+{
+  "xcursor_init": 5,
+  "xcursor_prev": 25,
+  "xcursor_next": 23,
+  "filter_text": "10",
+  "flatten": true,
+  "fields": {
+    "id": "ID",
+    "word": "WoRd"
+  }
+}
+EOL
+}
+
+category/list() {
+cat <<EOL
+{
+  "xname": "jkl"
+}
+EOL
+}
+
+category/create() {
+cat <<EOL
+[
+  {"name": "abc", "color": "ff0000"},
+  null,
+  {"name": "def", "color": "00ff00"},
+  {"name": "ghi", "color": "0000ff"},
+  111,
+  {"name": "jkl", "color": "000000"}
+]
+EOL
+}
+
+category/update() {
+cat <<EOL
+{
+  "id": 75,
+  "name": "axx"
+}
+EOL
+}
+
+category/delete() {
+cat <<EOL
+{
+  "id": 75
+}
+EOL
+}
+
+
+color/list() {
+cat <<EOL
+{
+  "cursor_init": 1,
+  "xcursor_next": 40,
+  "cursor_prev": 11,
+  "xilter_text": "ellow"
+}
+EOL
+}
+
+todo/create() {
+cat <<EOL
+{
+  "xid": 3,
+  "task": "dummy",
+  "due":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
+  "done": false,
+  "categories":[71, 31]
+}
+EOL
+}
+
+todo/list() {
+cat <<EOL
+{
+  "id": 101,
+  "xtask": "dummy",
+  "xdue":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
+  "xdone": false,
+  "xcategories":[71, 31]
+}
+EOL
+}
+
+todo/update() {
+cat <<EOL
+{
+  "id": 101,
+  "task": "dummy dummy",
+  "xdue":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
+  "xdone": false,
+  "xcategories":[71, 31]
+}
+EOL
+}
+
+
+ecco() {
 cat <<EOL
 {
   "boolt": true,
@@ -56,31 +155,6 @@ cat <<EOL
 EOL
 }
 
-
-kx() {
-cat <<EOL
-[
-  {"name": "abc", "color": "ff0000"},
-  null,
-  {"name": "def", "color": "00ff00"},
-  {"name": "ghi", "color": "0000ff"},
-  111,
-  {"name": "jkl", "color": "000000"}
-]
-EOL
-}
-
-kx() {
-cat <<EOL
-{
-  "id": 3,
-  "ktask": "dummy",
-  "kdue":  $(date --date=" 2024-8-31 6:30AM" +%s 2> /dev/null || echo -n null),
-  "kdone": false,
-  "kcategories":[71, 31]
-}
-EOL
-}
 
 x() {
 cat <<EOL
