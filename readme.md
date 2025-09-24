@@ -1,6 +1,6 @@
 # Barebones Todo Minimal API - ASP.NET Core 8 (SQlite)
 
-A sample minimal todo list api in C# with ASP.NET Core 8. This project uses
+A sample minimal todo list api in C# with ASP.NET Core 9. This project uses
 SQlite for database. Check out
 [/v7e5/bareapi_asp_core_mssql](https://github.com/v7e5/bareapi_asp_core_mssql)
 for a version that uses SQLServer/MSSQL.
