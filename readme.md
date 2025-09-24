@@ -1,4 +1,4 @@
-# Barebones Todo Minimal API - ASP.NET Core 8 (SQlite)
+# Barebones Todo Minimal API - ASP.NET Core 9 (SQlite)
 
 A sample minimal todo list api in C# with ASP.NET Core 9. This project uses
 SQlite for database. Check out
