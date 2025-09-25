@@ -23,7 +23,57 @@ routes using curl. Feel free to ignore them if they don't match your use case.
 
 ## Endpoints
 
-### Auth
+### Unauthenticated endpoints
+
+#### hailstone
+POST, GET: `/hailstone`
+
+Returns the Collatz (Hailstone) sequence for a given positive integer.
+
+
+Parameters:
+```shell
+{
+    "n": int (required)
+}
+```
+
+#### env
+POST, GET: `/env`
+
+List of environment variables as key-value pairs
+
+#### now
+POST: `/now`
+
+Returns current timestamps sourced from the database (local time, Unix epoch,
+formatted timestamp) and the server's UTC time.
+
+
+#### ecco
+POST: `/ecco`
+
+Echoes posted content with an optional delay parameter.
+
+Parameters:
+```shell
+{
+    "delay": int (optional),
+    ...
+}
+
+```
+
+#### cg
+POST, GET: `/cg`
+
+Simple test endpoint demonstrating the internal workings of non-generic and
+generic IEnumerable interfaces.
+
+#### img
+POST, GET: `/img`
+
+Returns a sample PNG image file stream from the static directory.
 
 #### login
 POST: `/login`
@@ -45,6 +95,8 @@ EOL
 'http://0.0.0.0:8000/login'
 
 ```
+
+### Authenticated endpoints
 
 #### logout
 POST: `/logout`
